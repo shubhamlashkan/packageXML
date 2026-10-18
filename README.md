@@ -49,7 +49,3 @@ The comparison is a manifest membership comparison, not a source-code diff and n
 Choose **Import & Merge** in the XML preview toolbar to load an existing `package.xml` from your device. The tool parses and previews it before changing the current selections, merges members by metadata type and member name, and removes duplicates. Unknown metadata types are added to the picker as imported types so their member names can remain in the generated manifest. The current API version is retained; a version mismatch is shown as a warning. File parsing runs in the browser and does not upload the XML.
 
 In destructive-changes mode, imported members become deletion targets. The modal warns about this so the user can review the mode before applying the merge.
-
-
-### Buy Me a Coffee support link
-The footer includes a small, brand-colored “Buy me a coffee” link to `https://buymeacoffee.com/shubhamlashkan`. It opens in a new tab and does not load a third-party widget or tracking script, keeping the tool lightweight and browser-only.
