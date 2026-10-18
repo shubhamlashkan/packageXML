@@ -453,3 +453,35 @@ body{background:var(--page);font-size:14px}
 @media(max-width:560px){
   .site-footer .coffee-support-link{min-height:40px;padding:8px 14px}
 }
+
+
+
+/* Helpful guide link in the site footer */
+.site-footer .footer-guide-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 12px;
+  padding: 8px 12px;
+  border: 1px solid #dce5ef;
+  border-radius: 8px;
+  background: #fff;
+  color: #1769c2;
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: none;
+  transition: background-color 0.18s ease, border-color 0.18s ease;
+}
+
+.site-footer .footer-guide-link:hover {
+  background: #f3f7fb;
+  border-color: #b8cde4;
+  color: #104d91;
+}
+
+.site-footer .footer-guide-link:focus-visible {
+  outline: 2px solid #1769c2;
+  outline-offset: 3px;
+}
+
