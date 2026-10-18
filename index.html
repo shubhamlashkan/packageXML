@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b5cab">
+  <title>Salesforce Package.xml Generator – Build &amp; Compare Manifests</title>
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="description" content="Generate Salesforce package.xml files online. Select metadata, import and merge manifests, compare XML changes, and create destructive changes ZIPs. No Salesforce login required.">
+  <meta name="keywords" content="Salesforce package XML generator, package.xml generator, Salesforce deployment manifest, Salesforce metadata API, Salesforce developer tools">
+  <link rel="canonical" href="https://packagexml.dev/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Salesforce Package.xml Generator – Build &amp; Compare Manifests">
+  <meta property="og:description" content="Generate Salesforce package.xml files online. Select metadata, import and merge manifests, compare XML changes, and create destructive changes ZIPs. No Salesforce login required.">
+  <meta property="og:url" content="https://packagexml.dev/">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Salesforce Package.xml Generator – Build &amp; Compare Manifests">
+  <meta name="twitter:description" content="Generate Salesforce package.xml files online. Select metadata, import and merge manifests, compare XML changes, and create destructive changes ZIPs. No Salesforce login required.">
+  <link rel="stylesheet" href="styles.css">
+  <script type="application/ld+json">
+  {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Salesforce Package.xml Generator",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "description": "Generate Salesforce package.xml files online. Select metadata, import and merge manifests, compare XML changes, and create destructive changes ZIPs. No Salesforce login required.",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "url": "https://packagexml.dev/"
+}
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#" aria-label="Salesforce Package XML Generator home">
+      <span class="brand-mark" aria-hidden="true">&lt;/&gt;</span>
+      <span><strong>Package XML</strong><small>Salesforce Developer Tool</small></span>
+    </a>
+    <a class="header-link" href="#how-it-works">How it works <span aria-hidden="true">↓</span></a>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="eyebrow"><span class="pulse"></span> FREE SALESFORCE DEVELOPER TOOL</div>
+      <h1>Salesforce Package XML <span>Generator</span></h1>
+      <p class="hero-copy">Build, import, merge, and compare Salesforce metadata manifests. Preview your <code>package.xml</code> and create destructive changes ZIPs—all in your browser, with no Salesforce login.</p>
+      <div class="hero-points">
+        <span><b>✓</b> Live preview</span><span><b>✓</b> Bulk paste</span><span><b>✓</b> No login required</span>
+      </div>
+</section>
+
+    <section class="workspace-shell" aria-label="Package XML builder">
+      <div class="workspace-topline">
+        <div><span class="workspace-indicator"></span><strong>Manifest workspace</strong><span class="workspace-subtitle">Configure your deployment package</span></div>
+        <span class="browser-badge"><span aria-hidden="true">⌑</span> Runs locally in your browser</span>
+      </div>
+      <section class="workspace" aria-label="Package XML builder">
+      <div class="builder-panel panel">
+        <div class="panel-heading">
+          <div><span class="step">01</span><h2>Select metadata</h2></div>
+          <span class="muted small" id="selected-count">0 selected</span>
+        </div>
+        <label class="search-wrap"><span aria-hidden="true">⌕</span><input id="type-search" type="search" placeholder="Search metadata types..." autocomplete="off"></label>
+        <div id="metadata-list" class="metadata-list"></div>
+        <div class="panel-heading component-heading">
+          <div><span class="step">02</span><h2>Component names</h2></div>
+        </div>
+        <div class="mode-switch" role="group" aria-label="Manifest mode"><button type="button" class="mode-button active" id="standard-mode" aria-pressed="true">Package manifest</button><button type="button" class="mode-button" id="destructive-mode" aria-pressed="false">Destructive changes</button></div>
+        <p class="mode-note" id="mode-note">Generate a package.xml for retrieving or deploying selected metadata.</p>
+        <div class="helper">
+          <strong>Enter component names</strong>
+          <span>One name per line, or separate names with commas. You can paste a whole list at once.</span>
+        </div>
+        <div id="component-editors" class="component-editors">
+          <div class="empty-state"><span class="empty-icon">＋</span><strong>No metadata types selected</strong><p>Select one or more types above to add their members.</p></div>
+        </div>
+        <div class="options-row">
+          <div class="api-version-label"><label for="api-version">Metadata API version</label><span class="field-hint" id="api-version-help">Enter a version such as 66.0</span></div>
+          <input id="api-version" type="text" inputmode="decimal" value="66.0" maxlength="5" aria-describedby="api-version-help" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="builder-actions"><button class="button button-secondary" id="clear-button" type="button">Clear all</button><button class="button button-primary" id="generate-button" type="button"><span aria-hidden="true">↓</span> Download package.xml</button></div>
+        <p class="mode-warning" id="mode-warning" hidden>Destructive changes can permanently delete metadata when deployed. Review every selected member before using these files.</p>
+        <p class="privacy-note"><span aria-hidden="true">⌑</span> Your input stays in this browser. Nothing is uploaded to a server.</p>
+      </div>
+
+      <aside class="preview-panel panel" aria-label="XML preview">
+        <div class="preview-heading">
+          <div><span class="step">03</span><h2>XML preview</h2></div>
+          <span id="xml-status" class="status-pill">Ready to build</span>
+        </div>
+        <div class="code-toolbar">
+          <span><i class="file-dot"></i> <strong id="preview-filename">package.xml</strong><small>XML · UTF-8</small></span>
+          <div class="preview-toolbar-actions">
+            <button id="import-merge-open-button" class="button import-merge-open-button" type="button"><span class="import-merge-icon" aria-hidden="true">↥</span><span>Import &amp; Merge</span></button>
+            <button id="compare-open-button" class="button compare-open-button" type="button"><span class="compare-button-icon" aria-hidden="true">⇄</span><span class="compare-button-label">Compare XML</span><span class="compare-button-hint">NEW</span></button>
+            <button id="copy-button" class="button button-secondary copy-button" type="button"><span aria-hidden="true">▢</span> Copy XML</button>
+          </div>
+        </div>
+        <pre class="code-window"><code id="xml-output" aria-live="polite"><?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+  <version>66.0</version>
+</Package></code></pre>
+        <div id="validation-message" class="validation-message" role="status">Select metadata types and add component names to build your manifest.</div>
+        <div class="preview-footer"><span><span class="green-dot"></span> XML is generated locally</span><span id="member-count">0 members</span></div>
+      </aside>
+      </section>
+    </section>
+
+    <section class="how-section" id="how-it-works">
+      <div class="section-intro"><span class="eyebrow">MADE FOR SALESFORCE DEVELOPERS</span><h2>From component names to package.xml</h2><p>A simple workflow for preparing a Salesforce metadata deployment manifest.</p></div>
+      <div class="feature-grid">
+        <article class="feature-card"><span class="feature-icon">⌕</span><h3>Find metadata fast</h3><p>Search common Salesforce metadata types instead of hunting through a long list.</p></article>
+        <article class="feature-card"><span class="feature-icon">↵</span><h3>Paste names in bulk</h3><p>Add multiple Apex classes, flows, permission sets, or other component names at once.</p></article>
+        <article class="feature-card"><span class="feature-icon">&lt;/&gt;</span><h3>Preview and download</h3><p>Review the generated XML, copy it, or download a ready-to-save package.xml file.</p></article>
+      </div>
+      <p class="disclaimer">This tool checks manifest structure and common issues locally. It cannot confirm that components exist in your org or guarantee deployment success.</p>
+    </section>
+    <section class="companion-secondary companion-feature-promo" aria-labelledby="companion-secondary-title">
+  <div class="companion-promo-header">
+    <div class="companion-secondary-mark" aria-hidden="true">
+      <svg viewBox="0 0 48 48" role="img" aria-label="Chrome-style icon">
+        <circle cx="24" cy="24" r="22" fill="#fff"/>
+        <path d="M24 24 5.2 24A19 19 0 0 0 38.5 34.5Z" fill="#34A853"/>
+        <path d="M24 24 38.5 34.5A19 19 0 0 0 14.5 7.5Z" fill="#FBBC05"/>
+        <path d="M24 24 14.5 7.5A19 19 0 0 0 5.2 24Z" fill="#EA4335"/>
+        <circle cx="24" cy="24" r="9.5" fill="#4285F4" stroke="#fff" stroke-width="2.5"/>
+      </svg>
+    </div>
+    <div class="companion-promo-heading">
+      <span class="companion-eyebrow">FOR SALESFORCE ADMINS &amp; DEVELOPERS</span>
+      <h2 id="companion-secondary-title">Meet Salesforce Companion</h2>
+      <p class="companion-promo-subtitle">Your productivity sidebar for Salesforce</p>
+    </div>
+  </div>
+  <p class="companion-promo-description">Spend less time navigating Setup and more time getting things done. Find fields and API names, generate SOQL queries, jump to frequently used tools, and identify your Salesforce environment—all from a handy sidebar inside Salesforce.</p>
+  <div class="companion-feature-grid">
+    <div class="companion-feature">
+      <span class="companion-feature-icon" aria-hidden="true">⌕</span>
+      <div><strong>Instant field search</strong><span>Find objects, fields, and API names quickly.</span></div>
+    </div>
+    <div class="companion-feature">
+      <span class="companion-feature-icon" aria-hidden="true">&lt;/&gt;</span>
+      <div><strong>SOQL generator</strong><span>Build queries for the current record.</span></div>
+    </div>
+    <div class="companion-feature">
+      <span class="companion-feature-icon" aria-hidden="true">↗</span>
+      <div><strong>Quick navigation</strong><span>Open Setup tools and Developer Console faster.</span></div>
+    </div>
+    <div class="companion-feature">
+      <span class="companion-feature-icon" aria-hidden="true">◉</span>
+      <div><strong>Environment awareness</strong><span>Know when you're in Production, Sandbox, or Developer Edition.</span></div>
+    </div>
+  </div>
+  <div class="companion-promo-footer">
+    <span class="companion-promo-note">Chrome extension · Opens in the Chrome Web Store</span>
+    <a class="companion-secondary-button" href="https://chromewebstore.google.com/detail/salesforce-companion/apmdmekheggcegdfhlnkcpmmaahhdmol?hl=en" target="_blank" rel="noopener noreferrer">Try Salesforce Companion <span aria-hidden="true">↗</span></a>
+  </div>
+</section>
+
+    <section class="faq-section" id="faq"><div class="section-intro"><span class="eyebrow">HELP &amp; GUIDANCE</span><h2>Frequently asked questions</h2><p>Quick answers for creating and using Salesforce metadata manifests.</p></div><div class="faq-list">
+      <details class="faq-item"><summary>What if I can’t find a metadata type?</summary><p>You can add a metadata type entry to the XML after generation. Use the exact API name documented by Salesforce’s Metadata API and follow the structure of the other <code>&lt;types&gt;</code> entries. Confirm that the type is supported by your selected API version.</p></details>
+      <details class="faq-item"><summary>Which API version should I select?</summary><p>Use the version your project or deployment workflow targets. If your project has an <code>sfdx-project.json</code> file, its <code>sourceApiVersion</code> is a useful reference. Older versions may not support newer metadata features.</p></details>
+      <details class="faq-item"><summary>Does this website connect to my Salesforce org?</summary><p>No sign-in or org authorization is required. Your selections and XML are processed in your browser and are not sent to a Salesforce org by this tool.</p></details>
+      <details class="faq-item"><summary>Does validation guarantee deployment will succeed?</summary><p>No. Local checks can catch common issues, but cannot confirm component existence, org permissions, dependencies, or all Salesforce deployment rules.</p></details>
+      <details class="faq-item"><summary>What is a destructive changes manifest?</summary><p>It identifies metadata to delete rather than retrieve or deploy. Deletion workflows have additional deployment requirements; review Salesforce’s current deployment documentation and carefully inspect every member before use.</p></details>
+      <details class="faq-item"><summary>What does the ZIP download contain?</summary><p>Package mode includes <code>package.xml</code>. Destructive changes mode includes <code>package.xml</code> and <code>destructiveChanges.xml</code> using the selected API version.</p></details>
+      <details class="faq-item"><summary>Why is a component missing from the XML?</summary><p>Only selected metadata types with component names are included. Check that the correct type is selected and that names are entered in its matching field.</p></details>
+      <details class="faq-item"><summary>Is my XML uploaded or stored?</summary><p>Manifest generation and ZIP creation run locally in your browser. This tool does not upload your manifest to a backend. Your organization may still have policies about accessing unapproved websites.</p></details>
+      <details class="faq-item">
+        <summary>Can I import an existing package.xml?</summary>
+        <p>Yes. Use Import &amp; Merge to choose an existing package.xml. The tool previews the imported members and merges them with your current selections after you confirm.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Will importing a package.xml create duplicate members?</summary>
+        <p>No duplicate type/member entries are added. If the same member is already selected or appears more than once in the imported manifest, the merged output keeps one entry.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What happens to metadata types this generator doesn't display?</summary>
+        <p>The importer reports unsupported types. The tool is designed to preserve valid imported entries in the generated manifest where possible; review the import summary before applying the merge.</p>
+      </details>
+    </div>
+
+
+</section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Developed using AI by <a href="https://shubhamlashkan.com" target="_blank" rel="noopener noreferrer">Shubham Lashkan</a></p>
+    <span>Built for the Salesforce developer community</span>
+    <a class="coffee-support-link" href="https://buymeacoffee.com/shubhamlashkan" target="_blank" rel="noopener noreferrer" aria-label="Support this free tool on Buy Me a Coffee">
+      <span class="coffee-cup-icon" aria-hidden="true">☕</span> Buy me a coffee
+    </a>
+  </footer>
+
+  <div id="compare-modal" class="compare-modal" hidden>
+    <div class="compare-backdrop" data-close-compare></div>
+    <section class="compare-dialog" role="dialog" aria-modal="true" aria-labelledby="compare-title" aria-describedby="compare-description">
+      <header class="compare-dialog-header">
+        <div>
+          <span class="eyebrow">MANIFEST COMPARISON</span>
+          <h2 id="compare-title">Compare package.xml</h2>
+          <p id="compare-description">Compare your generated manifest with another XML manifest. Everything runs in this browser.</p>
+        </div>
+        <button type="button" class="compare-close" id="compare-close-button" aria-label="Close comparison">×</button>
+      </header>
+      <div class="compare-input-grid">
+        <section class="compare-input-card">
+          <div class="compare-input-heading"><div><strong>Your generated XML</strong><span>Current generator preview · read-only</span></div><span class="compare-tag generated-tag">Generated</span></div>
+          <textarea id="compare-generated-xml" aria-label="Your generated XML" readonly spellcheck="false"></textarea>
+        </section>
+        <section class="compare-input-card">
+          <div class="compare-input-heading"><div><strong>XML to compare</strong><span>Paste the other package.xml here</span></div><span class="compare-tag pasted-tag">Paste XML</span></div>
+          <textarea id="compare-pasted-xml" aria-label="XML to compare" placeholder="<?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#10;&lt;Package xmlns=&quot;http://soap.sforce.com/2006/04/metadata&quot;&gt;&#10;  ...&#10;&lt;/Package&gt;" spellcheck="false"></textarea>
+        </section>
+      </div>
+      <div class="compare-dialog-actions">
+        <p class="compare-privacy-note"><span aria-hidden="true">⌑</span> XML is processed locally and is not uploaded.</p>
+        <button type="button" id="compare-run-button" class="button button-primary"><span aria-hidden="true">⇄</span> Compare manifests</button>
+      </div>
+      <div id="compare-error" class="compare-error" role="alert" hidden></div>
+      <section id="compare-results" class="compare-results" aria-live="polite" hidden>
+        <div class="compare-results-heading"><div><h3>Comparison results</h3><p id="compare-summary">Review differences between the two manifests.</p></div><button type="button" id="compare-reset-button" class="button button-secondary">Clear results</button></div>
+        <div class="compare-stats">
+          <div class="compare-stat added-stat"><span>Added to pasted XML</span><strong id="compare-added-count">0</strong></div>
+          <div class="compare-stat removed-stat"><span>Removed from pasted XML</span><strong id="compare-removed-count">0</strong></div>
+          <div class="compare-stat unchanged-stat"><span>Unchanged</span><strong id="compare-unchanged-count">0</strong></div>
+        </div>
+        <div id="compare-version-note" class="compare-version-note" hidden></div>
+        <div class="compare-result-tools">
+          <label class="compare-search"><span aria-hidden="true">⌕</span><input id="compare-result-search" type="search" placeholder="Search type or member..." autocomplete="off"></label>
+          <div class="compare-filter" role="group" aria-label="Filter comparison results">
+            <button type="button" data-compare-filter="all" class="active" aria-pressed="true">All</button>
+            <button type="button" data-compare-filter="added" aria-pressed="false">Added</button>
+            <button type="button" data-compare-filter="removed" aria-pressed="false">Removed</button>
+            <button type="button" data-compare-filter="unchanged" aria-pressed="false">Unchanged</button>
+          </div>
+        </div>
+        <div id="compare-result-list" class="compare-result-list"></div>
+        <p id="compare-wildcard-note" class="compare-wildcard-note" hidden></p>
+      </section>
+    </section>
+  </div>
+
+
+  <div id="import-merge-modal" class="import-merge-modal" hidden>
+    <div class="import-merge-backdrop" data-close-import-merge></div>
+    <section class="import-merge-dialog" role="dialog" aria-modal="true" aria-labelledby="import-merge-title" aria-describedby="import-merge-description">
+      <header class="import-merge-header">
+        <div>
+          <span class="eyebrow">IMPORT EXISTING MANIFEST</span>
+          <h2 id="import-merge-title">Import &amp; Merge</h2>
+          <p id="import-merge-description">Bring in an existing package.xml and combine it with your current selections. Duplicates are removed automatically.</p>
+        </div>
+        <button type="button" class="import-merge-close" id="import-merge-close" aria-label="Close Import and Merge">×</button>
+      </header>
+      <div class="import-merge-content">
+        <div id="import-merge-dropzone" class="import-merge-dropzone" tabindex="0" role="button" aria-label="Choose a package.xml file or drop it here">
+          <input id="import-merge-file" type="file" accept=".xml,text/xml,application/xml" hidden>
+          <span class="import-merge-upload-icon" aria-hidden="true">↥</span>
+          <strong>Choose your package.xml</strong>
+          <span class="import-merge-drop-copy">Drag and drop your file here, or <span class="import-merge-browse">browse files</span></span>
+          <span class="import-merge-file-hint">XML file · Processed locally in your browser</span>
+        </div>
+        <div id="import-merge-file-info" class="import-merge-file-info" hidden>
+          <span class="import-merge-file-icon" aria-hidden="true">XML</span>
+          <div class="import-merge-file-meta"><strong id="import-merge-file-name"></strong><span id="import-merge-file-detail"></span></div>
+          <button id="import-merge-remove-file" type="button" class="import-merge-remove-file" aria-label="Remove selected file">Remove</button>
+        </div>
+        <div id="import-merge-error" class="import-merge-error" role="alert" hidden></div>
+        <div id="import-merge-summary" class="import-merge-summary" hidden aria-live="polite">
+          <div class="import-merge-summary-heading"><div><strong>Import preview</strong><span>Review what will be merged before applying it.</span></div><span class="import-merge-ready"><span aria-hidden="true">✓</span> Ready to merge</span></div>
+          <div class="import-merge-metrics">
+            <div><span>New members</span><strong id="import-merge-new-count">0</strong></div>
+            <div><span>Duplicates skipped</span><strong id="import-merge-duplicate-count">0</strong></div>
+            <div><span>Metadata types</span><strong id="import-merge-type-count">0</strong></div>
+          </div>
+          <div id="import-merge-warning" class="import-merge-warning" hidden></div>
+          <details class="import-merge-details">
+            <summary>Review imported metadata</summary>
+            <div id="import-merge-review-list" class="import-merge-review-list"></div>
+          </details>
+        </div>
+      </div>
+      <footer class="import-merge-footer">
+        <p><span aria-hidden="true">🔒</span> Your XML stays on this device. Nothing is uploaded.</p>
+        <div class="import-merge-footer-actions">
+          <button type="button" id="import-merge-cancel" class="button button-secondary">Cancel</button>
+          <button type="button" id="import-merge-apply" class="button button-primary" disabled><span aria-hidden="true">↥</span> Import &amp; Merge</button>
+        </div>
+      </footer>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

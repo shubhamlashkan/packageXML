@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://packagexml.dev/sitemap.xml
