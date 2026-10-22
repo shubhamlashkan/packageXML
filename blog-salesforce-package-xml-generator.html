@@ -7,7 +7,8 @@
 <meta name="description" content="Create a Salesforce package.xml manifest online. Learn the XML structure, see an example, and build manifests with a free generator.">
 <meta name="robots" content="index,follow">
 <link rel="canonical" href="https://packagexml.dev/blog-salesforce-package-xml-generator.html">
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="stylesheet" href="./styles.css">
 <meta property="og:type" content="article">
 <meta property="og:title" content="How to Create a Salesforce package.xml File Online">
 <meta property="og:description" content="A short guide to Salesforce package.xml manifests, with an example and a free online generator.">
@@ -16,22 +17,45 @@
 <meta name="twitter:title" content="How to Create a Salesforce package.xml File Online">
 <meta name="twitter:description" content="Learn the basics of package.xml and create a manifest online.">
 <style>
-:root{--ink:#152943;--muted:#53677f;--blue:#1769c2;--line:#dce5ef;--surface:#f3f7fb;--code:#101e30}
-*{box-sizing:border-box}body{margin:0;background:#fff;color:#25364b;font:16px/1.75 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}a{color:var(--blue);text-underline-offset:3px}header{border-bottom:1px solid var(--line);background:#fff}.head{max-width:1000px;margin:auto;padding:15px 22px;display:flex;justify-content:space-between;align-items:center;gap:16px}.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-weight:800}.mark{display:grid;place-items:center;width:38px;height:38px;border-radius:10px;background:#1268bf;color:#fff;font-size:13px}main{max-width:800px;margin:auto;padding:42px 22px 64px}.eyebrow{color:var(--blue);font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}h1,h2{color:var(--ink);line-height:1.25;letter-spacing:-.025em}h1{font-size:clamp(2rem,5vw,3rem);margin:12px 0}h2{font-size:1.55rem;margin:36px 0 12px}.dek{font-size:1.15rem;color:var(--muted)}.byline{font-size:13px;color:var(--muted);margin:16px 0 24px}.cta{display:inline-block;background:var(--blue);color:#fff;text-decoration:none;font-weight:800;padding:11px 16px;border-radius:8px;margin:4px 0 18px}.callout{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--blue);padding:16px 18px;border-radius:9px;margin:22px 0}pre{overflow:auto;background:var(--code);color:#e7f0ff;border-radius:10px;padding:18px;font-size:14px;line-height:1.6}code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}p code{background:#edf3f9;color:#183451;border-radius:4px;padding:2px 5px}.note{font-size:14px;color:var(--muted)}footer{max-width:800px;margin:0 auto;border-top:1px solid var(--line);padding:20px 22px 36px;color:var(--muted);font-size:14px}.coffee{display:inline-block;background:#ffdd00;color:#202020;padding:7px 11px;border-radius:7px;text-decoration:none;font-weight:800}@media(max-width:600px){main{padding:30px 18px 48px}.head{padding:12px 16px}.dek{font-size:1.03rem}}
+.guide-main{max-width:800px;margin:0 auto;padding:42px 22px 64px;background:#fff;color:#25364b;font:16px/1.75 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.guide-main a{color:#1769c2;text-underline-offset:3px}
+.guide-main .eyebrow{display:block;color:#0b5cab;font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.guide-main h1,.guide-main h2{color:#152943;line-height:1.25;letter-spacing:-.025em}
+.guide-main h1{font-size:clamp(2rem,5vw,3rem);margin:12px 0}
+.guide-main h2{font-size:1.55rem;margin:36px 0 12px}
+.guide-main .dek{font-size:1.15rem;color:#53677f;margin:0}
+.guide-main .byline{font-size:13px;color:#53677f;margin:16px 0 24px}
+.guide-main .cta{display:inline-block;background:#1769c2;color:#fff;text-decoration:none;font-weight:800;padding:11px 16px;border-radius:8px;margin:4px 0 18px}
+.guide-main .callout{background:#f3f7fb;border:1px solid #dce5ef;border-left:4px solid #1769c2;padding:16px 18px;border-radius:9px;margin:22px 0}
+.guide-main pre{overflow:auto;background:#101e30;color:#e7f0ff;border-radius:10px;padding:18px;font-size:14px;line-height:1.6}
+.guide-main code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.guide-main p code{background:#edf3f9;color:#183451;border-radius:4px;padding:2px 5px}
+.guide-main .note{font-size:14px;color:#53677f}
+@media(max-width:600px){.guide-main{padding:30px 18px 48px}.guide-main .dek{font-size:1.03rem}}
 </style>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"Article","headline":"How to Create a Salesforce package.xml File Online","description":"A short guide to Salesforce package.xml manifests with an example and a free online generator.","mainEntityOfPage":{"@type":"WebPage","@id":"https://packagexml.dev/blog-salesforce-package-xml-generator.html"},"author":{"@type":"Person","name":"Shubham Lashkan","url":"https://shubhamlashkan.com/"},"publisher":{"@type":"Organization","name":"packagexml.dev","url":"https://packagexml.dev/"},"datePublished":"2026-10-18","dateModified":"2026-10-18"}
 </script>
 </head>
 <body>
-<header><div class="head"><a class="brand" href="/"><span class="mark">&lt;/&gt;</span><span>Package XML <span style="display:block;font-size:11px;font-weight:500;color:#61758b">Salesforce Developer Tool</span></span></a><a href="/">Open generator →</a></div></header>
-<main>
+<header class="site-header">
+  <a class="brand" href="./index.html" aria-label="Salesforce Package XML Generator home">
+    <span class="brand-mark" aria-hidden="true">&lt;/&gt;</span>
+    <span><strong>Package XML</strong><small>Salesforce Developer Tool</small></span>
+  </a>
+  <nav class="tool-nav" aria-label="Main navigation">
+    <a class="header-link" href="./index.html">Package XML Generator</a>
+    <a class="header-link" href="./formula-formatter.html">Formula Formatter</a>
+    <a class="header-link" href="./blog-salesforce-package-xml-generator.html" aria-current="page">Developer Guide</a>
+  </nav>
+</header>
+<main class="guide-main">
 <article>
 <div class="eyebrow">Salesforce Developer Guide</div>
 <h1>How to Create a Salesforce <code>package.xml</code> File Online</h1>
 <p class="dek">A quick guide to Salesforce metadata manifests, with a practical XML example and a free tool to build your own.</p>
 <p class="byline">By <a href="https://shubhamlashkan.com/">Shubham Lashkan</a> · Updated October 18, 2026</p>
-<a class="cta" href="/">Create a package.xml manifest →</a>
+<a class="cta" href="./index.html">Create a package.xml manifest →</a>
 <h2>What is package.xml?</h2>
 <p>A Salesforce <code>package.xml</code> file is a metadata manifest that lists the component types and members to include in a Metadata API retrieve or deployment workflow. It can specify Apex classes, triggers, custom objects, fields, flows, layouts, and other supported metadata.</p>
 <h2>Example package.xml</h2>
@@ -52,7 +76,7 @@
 <p>Use an API version that matches your project and tooling. A valid XML structure does not guarantee that every component exists or that a deployment will succeed.</p>
 <h2>Create a manifest online</h2>
 <ol>
-<li>Open the <a href="/">Salesforce package.xml Generator</a>.</li>
+<li>Open the <a href="./index.html">Salesforce package.xml Generator</a>.</li>
 <li>Select the metadata types you need.</li>
 <li>Enter the component API names.</li>
 <li>Review the generated XML and API version.</li>
@@ -61,12 +85,13 @@
 <h2>More than generating XML</h2>
 <p>You can also import and merge an existing manifest, compare XML files to review added or removed members, and prepare a ZIP for a destructive-changes workflow.</p>
 <p>Review all component names and destructive changes before using the files in a release.</p>
-<div class="callout"><strong>Ready to build your manifest?</strong><br>Use the free browser-based generator to create and review your Salesforce <code>package.xml</code>.<br><a class="cta" href="/">Open the generator →</a></div>
+<div class="callout"><strong>Ready to build your manifest?</strong><br>Use the free browser-based generator to create and review your Salesforce <code>package.xml</code>.<br><a class="cta" href="./index.html">Open the generator →</a></div>
 </article>
 </main>
-<footer>
-<p>Created by <a href="https://shubhamlashkan.com/">Shubham Lashkan</a> · <a href="/">Package XML Generator</a></p>
-<a class="coffee" href="https://buymeacoffee.com/shubhamlashkan" target="_blank" rel="noopener noreferrer">☕ Buy me a coffee</a>
+<footer class="site-footer">
+  <p>Developed using AI by <a href="https://shubhamlashkan.com/" target="_blank" rel="noopener noreferrer">Shubham Lashkan</a></p>
+  <span>Built for the Salesforce developer community</span>
+  <a class="coffee-support-link" href="https://buymeacoffee.com/shubhamlashkan" target="_blank" rel="noopener noreferrer" aria-label="Support this free tool on Buy Me a Coffee"><span class="coffee-cup-icon" aria-hidden="true">☕</span> Buy me a coffee</a>
 </footer>
 </body>
 </html>

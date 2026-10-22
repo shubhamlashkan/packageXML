@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b5cab">
+  <title>Salesforce Formula Formatter | Format Salesforce Formulas Online</title>
+  <meta name="description" content="Format Salesforce formulas automatically, explore nested logic, and inspect functions and values in your browser. No Salesforce login required.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://packagexml.dev/formula-formatter.html">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="stylesheet" href="./styles.css">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Salesforce Formula Formatter | packagexml.dev">
+  <meta property="og:description" content="Format Salesforce formulas automatically and explore nested logic in your browser.">
+  <meta property="og:url" content="https://packagexml.dev/formula-formatter.html">
+  <meta name="twitter:card" content="summary">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="./index.html" aria-label="Package XML Generator home">
+      <span class="brand-mark" aria-hidden="true">&lt;/&gt;</span>
+      <span><strong>Package XML</strong><small>Salesforce Developer Tool</small></span>
+    </a>
+    <nav class="tool-nav" aria-label="Main navigation">
+      <a class="header-link" href="./index.html">Package XML Generator</a>
+      <a class="header-link" href="./formula-formatter.html" aria-current="page">Formula Formatter</a>
+      <a class="header-link" href="./blog-salesforce-package-xml-generator.html">Developer Guide</a>
+    </nav>
+  </header>
+  <main>
+    <section class="hero formula-hero">
+      <div class="eyebrow"><span class="pulse"></span> FREE SALESFORCE DEVELOPER TOOL</div>
+      <h1>Salesforce Formula <span>Formatter</span></h1>
+      <p class="hero-copy">Make complex formulas easier to read. Format nested logic, explore expressions, and inspect functions and values — without connecting to a Salesforce org.</p>
+      <div class="hero-points">
+        <span><b>✓</b> Auto formatting</span><span><b>✓</b> Explore nested logic</span><span><b>✓</b> No login required</span>
+      </div>
+      <p class="formula-privacy"><span class="privacy-check" aria-hidden="true">✓</span> Your formula stays in this browser</p>
+    </section>
+    <section class="formula-workspace formula-footer-gap" aria-label="Salesforce formula formatter">
+      <div class="formula-grid">
+        <article class="formula-panel">
+          <div class="formula-panel-head">
+            <div class="formula-panel-title"><span class="formula-dot blue"></span>Input formula</div>
+            <span class="formula-sub" id="inputCount">0 characters</span>
+          </div>
+          <div class="formula-editor-wrap"><textarea class="formula-input" id="formulaInput" aria-label="Input formula" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="Paste a Salesforce formula here…"></textarea></div>
+          <div class="formula-input-foot">
+            <button class="button button-secondary" type="button" id="clearBtn">Clear</button>
+            <span id="inputLines">0 lines</span><span>Ctrl/⌘ + Enter</span>
+          </div>
+        </article>
+        <article class="formula-panel">
+          <div class="formula-panel-head formula-output-heading">
+            <div class="formula-panel-title"><span class="formula-dot"></span>Formatted output</div>
+            <div class="formula-toolbar" aria-label="Formatted output actions">
+              <button class="button button-secondary" type="button" id="expandBtn" disabled>Expand all</button>
+              <button class="button button-secondary" type="button" id="collapseBtn" disabled>Collapse all</button>
+              <button class="button button-primary" type="button" id="copyBtn">Copy output</button>
+            </div>
+            <span class="formula-sub" id="outputCount">Waiting for input</span>
+          </div>
+          <div class="formula-output-scroll" id="output" aria-live="polite"><div class="formula-empty">Your formatted formula will appear here.</div></div>
+          <div class="formula-status" id="status"><span>Ready to format</span><span id="nestingStatus">Nesting: —</span></div>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="companion-secondary-title" class="companion-secondary companion-feature-promo formula-companion-gap">
+<div class="companion-promo-header">
+<div aria-hidden="true" class="companion-secondary-mark">
+<svg aria-label="Chrome-style icon" role="img" viewbox="0 0 48 48">
+<circle cx="24" cy="24" fill="#fff" r="22"></circle>
+<path d="M24 24 5.2 24A19 19 0 0 0 38.5 34.5Z" fill="#34A853"></path>
+<path d="M24 24 38.5 34.5A19 19 0 0 0 14.5 7.5Z" fill="#FBBC05"></path>
+<path d="M24 24 14.5 7.5A19 19 0 0 0 5.2 24Z" fill="#EA4335"></path>
+<circle cx="24" cy="24" fill="#4285F4" r="9.5" stroke="#fff" stroke-width="2.5"></circle>
+</svg>
+</div>
+<div class="companion-promo-heading">
+<span class="companion-eyebrow">FOR SALESFORCE ADMINS &amp; DEVELOPERS</span>
+<h2 id="companion-secondary-title">Meet Salesforce Companion</h2>
+<p class="companion-promo-subtitle">Your productivity sidebar for Salesforce</p>
+</div>
+</div>
+<p class="companion-promo-description">Spend less time navigating Setup and more time getting things done. Find fields and API names, generate SOQL queries, jump to frequently used tools, and identify your Salesforce environment—all from a handy sidebar inside Salesforce.</p>
+<div class="companion-feature-grid">
+<div class="companion-feature">
+<span aria-hidden="true" class="companion-feature-icon">⌕</span>
+<div><strong>Instant field search</strong><span>Find objects, fields, and API names quickly.</span></div>
+</div>
+<div class="companion-feature">
+<span aria-hidden="true" class="companion-feature-icon">&lt;/&gt;</span>
+<div><strong>SOQL generator</strong><span>Build queries for the current record.</span></div>
+</div>
+<div class="companion-feature">
+<span aria-hidden="true" class="companion-feature-icon">↗</span>
+<div><strong>Quick navigation</strong><span>Open Setup tools and Developer Console faster.</span></div>
+</div>
+<div class="companion-feature">
+<span aria-hidden="true" class="companion-feature-icon">◉</span>
+<div><strong>Environment awareness</strong><span>Know when you're in Production, Sandbox, or Developer Edition.</span></div>
+</div>
+</div>
+<div class="companion-promo-footer">
+<span class="companion-promo-note">Chrome extension · Opens in the Chrome Web Store</span>
+<a class="companion-secondary-button" href="https://chromewebstore.google.com/detail/salesforce-companion/apmdmekheggcegdfhlnkcpmmaahhdmol?hl=en" rel="noopener noreferrer" target="_blank">Try Salesforce Companion <span aria-hidden="true">↗</span></a>
+</div>
+</section>
+  </main>
+  <footer class="site-footer formula-site-footer">
+    <p>Developed using AI by <a href="https://shubhamlashkan.com" target="_blank" rel="noopener noreferrer">Shubham Lashkan</a></p>
+    <span>Built for the Salesforce developer community</span>
+    <a class="coffee-support-link" href="https://buymeacoffee.com/shubhamlashkan" target="_blank" rel="noopener noreferrer" aria-label="Support this free tool on Buy Me a Coffee"><span class="coffee-cup-icon" aria-hidden="true">☕</span> Buy me a coffee</a>
+  </footer>
+  <div class="formula-toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="./formula-formatter.js"></script>
+</body>
+</html>

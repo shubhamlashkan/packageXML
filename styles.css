@@ -549,3 +549,299 @@ body{background:var(--page);font-size:14px}
   }
 }
 
+
+
+
+/* Formula Formatter — uses packagexml.dev shared site shell and tokens. */
+.formula-hero { padding-top: 42px; padding-bottom: 32px; }
+.formula-hero .hero-copy { max-width: 760px; }
+.formula-privacy { display:inline-flex; align-items:center; gap:7px; margin:13px 0 0; color:#13845e; font-size:12px; font-weight:700; }
+.formula-privacy .privacy-check { display:inline-grid; place-items:center; width:18px; height:18px; border-radius:50%; background:#dff7ed; font-size:12px; }
+.formula-workspace { max-width:1480px; margin:0 auto; padding:0 30px; }
+.formula-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:16px; align-items:stretch; }
+.formula-panel { min-width:0; overflow:hidden; border:1px solid var(--line); border-radius:14px; background:#fff; box-shadow:var(--shadow); display:flex; flex-direction:column; }
+.formula-panel-head { min-height:57px; padding:13px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px; border-bottom:1px solid var(--line); }
+.formula-panel-title { display:flex; align-items:center; gap:9px; font-size:13px; font-weight:750; }
+.formula-dot { width:8px; height:8px; flex:0 0 8px; border-radius:50%; background:#8d9cb0; }
+.formula-dot.blue { background:#0b5cab; }
+.formula-sub { color:var(--muted); font-size:11px; font-weight:550; text-align:right; }
+.formula-editor-wrap { min-width:0; flex:1; background:#101c2d; }
+.formula-input { display:block; width:100%; height:410px; min-height:260px; resize:none; border:0; border-radius:0; outline:0; background:#101c2d; color:#e5edf8; padding:18px 20px; font:13px/1.85 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; tab-size:2; white-space:pre; overflow:auto; }
+.formula-input::placeholder { color:#8292a8; }
+.formula-input:focus-visible { outline:2px solid #8ec5ff; outline-offset:-3px; }
+.formula-input-foot,.formula-status { min-height:40px; display:flex; align-items:center; justify-content:space-between; gap:8px; padding:10px 15px; border-top:1px solid #26384d; background:#142236; color:#a8bbd0; font-size:11px; }
+.formula-input-foot .btn { padding:7px 12px; }
+.formula-output-scroll { height:410px; min-height:260px; overflow:auto; background:#101c2d; color:#e5edf8; padding:14px 0; font:13px/1.85 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+.formula-output-scroll .code-line { display:block; min-width:max-content; white-space:normal; padding:0 18px; }
+.formula-output-scroll .code-content { display:block; white-space:pre; padding-right:20px; }
+.formula-output-scroll .code-content br { display:block; content:""; margin:0; }
+.formula-output-scroll .tok-fn { color:#67e8f9; font-weight:650; }
+.formula-output-scroll .tok-field { color:#93c5fd; }
+.formula-output-scroll .tok-string { color:#4ade80; }
+.formula-output-scroll .tok-number { color:#fbbf24; }
+.formula-output-scroll .tok-bool { color:#f9a8d4; font-weight:650; }
+.formula-output-scroll .tok-operator { color:#e2b8ff; }
+.formula-output-scroll .tok-paren { color:#c4b5fd; font-weight:800; }
+.formula-output-scroll .tok-comma { color:#8190a6; }
+.formula-output-scroll .fold-toggle { display:inline-grid; place-items:center; width:15px; height:15px; border:0; border-radius:4px; background:#30445e; color:#d5e4f7; font-size:11px; line-height:1; padding:0; margin-left:3px; vertical-align:middle; }
+.formula-output-scroll .fold-toggle:hover { background:#496481; }
+.formula-output-scroll .collapsed { display:inline-flex; align-items:center; gap:5px; border:1px solid #3b4a60; background:#1b2b40; color:#a8c7f5; border-radius:5px; padding:0 6px; font-size:11px; line-height:18px; vertical-align:middle; }
+.formula-status.error { color:#fca5a5; }
+.formula-toolbar { display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:6px; min-width:0; }
+.formula-toolbar .button { flex:0 0 auto; min-height:32px; padding:7px 10px; font-size:11px; white-space:nowrap; }
+.formula-output-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; min-width:0; flex-wrap:wrap; }
+.formula-output-heading .formula-panel-title { flex:0 0 auto; }
+.formula-output-heading .formula-toolbar { margin-left:auto; }
+.formula-output-heading .formula-sub { flex:0 0 auto; }
+.formula-empty { padding:18px; color:#8292a8; }
+.formula-toast { position:fixed; z-index:20; bottom:20px; left:50%; transform:translate(-50%,12px); opacity:0; pointer-events:none; background:#132238; color:#fff; border-radius:9px; padding:10px 15px; box-shadow:var(--shadow); font-size:12px; transition:opacity .18s,transform .18s; }
+.formula-toast.show { opacity:1; transform:translate(-50%,0); }
+.formula-footer-gap { margin-bottom:36px; }
+@media(max-width:900px) {
+ .formula-grid { grid-template-columns:minmax(0,1fr); max-width:720px; margin:0 auto; }
+ .formula-input,.formula-output-scroll { height:340px; min-height:260px; }
+ .formula-workspace { max-width:770px; }
+}
+@media(max-width:560px) {
+ .formula-hero { padding:29px 16px 24px; }
+ .formula-workspace { padding:0 12px; }
+ .formula-panel-head { padding:12px; }
+ .formula-input { padding:14px; font-size:12px; }
+ .formula-output-scroll { font-size:12px; }
+ .formula-output-heading { align-items:flex-start; }
+ .formula-output-heading .formula-toolbar { justify-content:flex-start; margin:0; }
+ .formula-toolbar .button { padding:7px 8px; }
+ .formula-sub { font-size:10px; }
+}
+
+/* Shared tool navigation */
+.tool-nav{display:flex;align-items:center;gap:22px}
+.tool-nav .header-link[aria-current="page"]{color:#fff}
+@media(max-width:700px){.tool-nav{gap:10px}.tool-nav .header-link{font-size:11px}}
+@media(max-width:480px){.site-header{padding:0 12px}.tool-nav{gap:8px}.tool-nav .header-link{font-size:10px}.brand{gap:7px}.brand-mark{width:30px;height:30px}.brand strong{font-size:11px}}
+
+
+
+
+
+/* Final Formula Formatter polish: share the generator's width, button system, and dark preview surface. */
+.formula-workspace { max-width:1280px; margin:0 auto; padding:0 24px; }
+.formula-grid { grid-template-columns:minmax(0,1fr) minmax(0,1fr); align-items:stretch; }
+.formula-panel { min-width:0; }
+.formula-editor-wrap { display:flex; flex:1 1 auto; min-height:0; background:#101c2d; }
+.formula-input { flex:1 1 auto; width:100%; height:410px; min-height:410px; resize:none; box-sizing:border-box; background:#101c2d; }
+.formula-output-scroll {
+  flex:1 1 auto;
+  height:auto;
+  min-height:410px;
+  box-sizing:border-box;
+  background:#101c2d;
+  color:#e5edf8;
+}
+.formula-status { flex:0 0 auto; background:#142236; }
+.formula-companion-gap { margin-bottom:40px; }
+@media(max-width:900px) {
+  .formula-workspace { max-width:800px; padding:0 20px; }
+  .formula-grid { grid-template-columns:minmax(0,1fr); max-width:none; margin:0 auto; }
+  .formula-input,.formula-output-scroll { height:340px; min-height:340px; }
+  .formula-editor-wrap { flex:0 0 340px; }
+  .formula-output-scroll { flex:0 0 340px; }
+}
+@media(max-width:560px) {
+  .formula-workspace { padding:0 12px; }
+  .formula-input,.formula-output-scroll { height:320px; min-height:320px; }
+  .formula-editor-wrap { flex:0 0 320px; }
+  .formula-output-scroll { flex-basis:320px; }
+  .formula-toolbar .button { min-height:38px; padding:8px 10px; }
+}
+
+
+/* Definitive Formula Formatter input sizing fix.
+   Keep the textarea and its dark editor wrapper exactly the same height;
+   prevent flex shrink from exposing an empty second-looking area below it. */
+.formula-panel .formula-editor-wrap {
+  display: block !important;
+  flex: 0 0 410px !important;
+  height: 410px !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: #101c2d !important;
+}
+.formula-panel .formula-editor-wrap > textarea.formula-input {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  margin: 0 !important;
+  padding: 18px 20px !important;
+  box-sizing: border-box !important;
+  resize: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  outline: 0 !important;
+  background: #101c2d !important;
+  color: #e5edf8 !important;
+  overflow: auto !important;
+  scrollbar-color: #40536b #101c2d;
+}
+.formula-panel .formula-editor-wrap > textarea.formula-input::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+.formula-panel .formula-editor-wrap > textarea.formula-input::-webkit-scrollbar-track {
+  background: #101c2d;
+}
+.formula-panel .formula-editor-wrap > textarea.formula-input::-webkit-scrollbar-thumb {
+  background: #40536b;
+  border: 3px solid #101c2d;
+  border-radius: 8px;
+}
+@media (max-width: 900px) {
+  .formula-panel .formula-editor-wrap {
+    flex-basis: 340px !important;
+    height: 340px !important;
+  }
+}
+@media (max-width: 560px) {
+  .formula-panel .formula-editor-wrap {
+    flex-basis: 320px !important;
+    height: 320px !important;
+  }
+  .formula-panel .formula-editor-wrap > textarea.formula-input {
+    padding: 14px !important;
+    font-size: 12px !important;
+  }
+}
+
+
+/* UX correction: fixed input workspace, content-growing formatted output.
+   The input remains a stable editor; the output panel grows with the formatted
+   formula instead of creating a second-looking blank region or inner vertical scroll. */
+.formula-panel:has(.formula-input) .formula-editor-wrap {
+  display: block !important;
+  flex: 0 0 410px !important;
+  height: 410px !important;
+  min-height: 410px !important;
+  overflow: hidden !important;
+}
+.formula-panel .formula-editor-wrap > textarea.formula-input {
+  display: block !important;
+  width: 100% !important;
+  height: 410px !important;
+  min-height: 410px !important;
+  max-height: 410px !important;
+  box-sizing: border-box !important;
+}
+.formula-panel .formula-output-scroll {
+  flex: 0 0 auto !important;
+  height: auto !important;
+  min-height: 410px !important;
+  max-height: none !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  background: #101c2d !important;
+}
+@media (max-width: 900px) {
+  .formula-panel:has(.formula-input) .formula-editor-wrap {
+    flex-basis: 340px !important;
+    height: 340px !important;
+    min-height: 340px !important;
+  }
+  .formula-panel .formula-editor-wrap > textarea.formula-input {
+    height: 340px !important;
+    min-height: 340px !important;
+    max-height: 340px !important;
+  }
+  .formula-panel .formula-output-scroll {
+    min-height: 340px !important;
+  }
+}
+@media (max-width: 560px) {
+  .formula-panel:has(.formula-input) .formula-editor-wrap {
+    flex-basis: 320px !important;
+    height: 320px !important;
+    min-height: 320px !important;
+  }
+  .formula-panel .formula-editor-wrap > textarea.formula-input {
+    height: 320px !important;
+    min-height: 320px !important;
+    max-height: 320px !important;
+  }
+  .formula-panel .formula-output-scroll {
+    min-height: 320px !important;
+  }
+}
+
+
+/* Final layout fix: only the formatted-output panel may grow.
+   Grid items must not stretch to the height of the taller output panel. */
+.formula-grid {
+  align-items: start !important;
+}
+.formula-grid > .formula-panel:first-child {
+  height: auto !important;
+  align-self: start !important;
+}
+.formula-grid > .formula-panel:first-child .formula-editor-wrap {
+  display: block !important;
+  flex: 0 0 410px !important;
+  height: 410px !important;
+  min-height: 410px !important;
+  max-height: 410px !important;
+}
+.formula-grid > .formula-panel:first-child .formula-input {
+  display: block !important;
+  width: 100% !important;
+  height: 410px !important;
+  min-height: 410px !important;
+  max-height: 410px !important;
+  flex: none !important;
+  resize: none !important;
+  box-sizing: border-box !important;
+}
+.formula-grid > .formula-panel:last-child {
+  height: auto !important;
+  align-self: start !important;
+}
+.formula-grid > .formula-panel:last-child .formula-output-scroll {
+  flex: 0 0 auto !important;
+  height: auto !important;
+  min-height: 410px !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+@media (max-width: 900px) {
+  .formula-grid { align-items: start !important; }
+  .formula-grid > .formula-panel:first-child .formula-editor-wrap {
+    flex-basis: 340px !important;
+    height: 340px !important;
+    min-height: 340px !important;
+    max-height: 340px !important;
+  }
+  .formula-grid > .formula-panel:first-child .formula-input {
+    height: 340px !important;
+    min-height: 340px !important;
+    max-height: 340px !important;
+  }
+  .formula-grid > .formula-panel:last-child .formula-output-scroll {
+    min-height: 340px !important;
+  }
+}
+@media (max-width: 560px) {
+  .formula-grid > .formula-panel:first-child .formula-editor-wrap {
+    flex-basis: 320px !important;
+    height: 320px !important;
+    min-height: 320px !important;
+    max-height: 320px !important;
+  }
+  .formula-grid > .formula-panel:first-child .formula-input {
+    height: 320px !important;
+    min-height: 320px !important;
+    max-height: 320px !important;
+  }
+  .formula-grid > .formula-panel:last-child .formula-output-scroll {
+    min-height: 320px !important;
+  }
+}

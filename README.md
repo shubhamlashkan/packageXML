@@ -49,3 +49,10 @@ The comparison is a manifest membership comparison, not a source-code diff and n
 Choose **Import & Merge** in the XML preview toolbar to load an existing `package.xml` from your device. The tool parses and previews it before changing the current selections, merges members by metadata type and member name, and removes duplicates. Unknown metadata types are added to the picker as imported types so their member names can remain in the generated manifest. The current API version is retained; a version mismatch is shown as a warning. File parsing runs in the browser and does not upload the XML.
 
 In destructive-changes mode, imported members become deletion targets. The modal warns about this so the user can review the mode before applying the merge.
+
+
+## Salesforce Formula Formatter
+
+Open `formula-formatter.html` to format Salesforce formula expressions in the browser. Formatting updates automatically as you type or paste. The page includes syntax highlighting, nested function expand/collapse, output copying, and character/line counts. It does not connect to Salesforce, evaluate formulas against an org, or guarantee that an expression is valid for every Salesforce formula context.
+
+The formatter is implemented with plain JavaScript and has no runtime dependencies. Its source input is processed in the page; the page contains no analytics or remote formatter script.
