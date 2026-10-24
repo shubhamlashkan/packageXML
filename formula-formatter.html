@@ -20,6 +20,24 @@
   <meta property="og:url" content="https://packagexml.dev/formula-formatter.html">
 
   <meta name="twitter:card" content="summary">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Salesforce Formula & Validation Rule Formatter",
+    "url": "https://packagexml.dev/formula-formatter.html",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Any",
+    "description": "Free online Salesforce formula and validation rule formatter with automatic indentation. Format nested formula logic directly in your browser.",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+
 </head>
 <body>
   <header class="site-header">
@@ -30,7 +48,6 @@
     <nav class="tool-nav" aria-label="Main navigation">
       <a class="header-link" href="./index.html">Package XML Generator</a>
       <a class="header-link" href="./formula-formatter.html" aria-current="page">Formula Formatter</a>
-      <a class="header-link" href="./blog-salesforce-package-xml-generator.html">Developer Guide</a>
     </nav>
   </header>
   <main>
@@ -73,6 +90,60 @@
           <div class="formula-output-scroll" id="output" aria-live="polite"><div class="formula-empty">Your formatted formula will appear here.</div></div>
           <div class="formula-status" id="status"><span>Ready to format</span><span id="nestingStatus">Nesting: —</span></div>
         </article>
+      </div>
+    </section>
+
+
+    <section class="how-section" aria-labelledby="formula-about-title">
+      <div class="section-intro">
+        <span class="eyebrow">SALESFORCE FORMULA &amp; VALIDATION RULE TOOL</span>
+        <h2 id="formula-about-title">Make complex Salesforce formulas easier to read</h2>
+        <p>Clean indentation helps you review formula logic, understand nested conditions, and maintain validation rules.</p>
+      </div>
+      <div style="max-width:860px;margin:26px auto 0;color:var(--muted);font-size:14px;line-height:1.8">
+        <p>Salesforce formulas can become difficult to follow as conditions, functions, and nested expressions grow. This free Salesforce formula formatter organizes your expression with consistent indentation so the logic is easier to scan. Paste a formula, format it in your browser, and copy the result back into your Salesforce workflow.</p>
+        <h3>Format formula fields and validation rules</h3>
+        <p>Use the formatter for formula fields, validation rule criteria, and other Salesforce formula expressions. It is useful when reviewing nested <code>IF()</code> statements, <code>CASE()</code> expressions, and combinations of <code>AND()</code>, <code>OR()</code>, and <code>ISCHANGED()</code>.</p>
+        <h3>Formatting happens in your browser</h3>
+        <p>The formatter is designed to improve readability, not to replace Salesforce's formula editor or compiler. Formatting alone does not prove that an expression is valid or that it will compile. Test your finished formula in Salesforce before using it in production.</p>
+      </div>
+    </section>
+
+    <section class="faq-section" id="formula-faq" aria-labelledby="formula-faq-title">
+      <div class="section-intro">
+        <span class="eyebrow">HELP &amp; GUIDANCE</span>
+        <h2 id="formula-faq-title">Salesforce Formula Formatter FAQs</h2>
+        <p>Answers about formatting Salesforce formulas and validation rules.</p>
+      </div>
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>How do I format a Salesforce formula online?</summary>
+          <p>Paste your Salesforce formula into the input editor. The formatter organizes the expression with readable indentation. Review the output and use Copy output to copy the formatted formula.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Can I format Salesforce validation rules with this tool?</summary>
+          <p>Yes. You can use the formatter to improve the readability of validation rule formulas, including conditions built with functions such as <code>AND()</code>, <code>OR()</code>, <code>NOT()</code>, <code>IF()</code>, and <code>ISCHANGED()</code>.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Does this Salesforce formula formatter support nested IF statements?</summary>
+          <p>Yes. It can organize nested <code>IF()</code> expressions so that each level of the formula is easier to inspect and maintain.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Can I format formulas containing CASE(), AND(), and OR()?</summary>
+          <p>Yes. The formatter is intended for Salesforce formula expressions that use functions such as <code>CASE()</code>, <code>AND()</code>, <code>OR()</code>, and other nested logic.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Does formatting validate Salesforce formula syntax?</summary>
+          <p>No. Formatting improves indentation and readability, but it does not guarantee that a formula is syntactically valid or will compile. Verify the formula in Salesforce.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Is my Salesforce formula uploaded to a server?</summary>
+          <p>The formatter runs in your browser and does not require a Salesforce login. Avoid entering confidential information into any online tool unless you have reviewed its implementation and your organization's policies.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Is this Salesforce formula formatter free?</summary>
+          <p>Yes. The formatter is free to use and does not require registration, installation, or a Salesforce login.</p>
+        </details>
       </div>
     </section>
 
