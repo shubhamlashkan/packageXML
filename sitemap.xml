@@ -11,4 +11,8 @@
     <loc>https://packagexml.dev/formula-formatter.html</loc>
     <lastmod>2026-10-24</lastmod>
   </url>
+  <url><loc>https://packagexml.dev/permission-diff.html</loc></url>
+  <url>
+    <loc>https://packagexml.dev/about.html</loc>
+  </url>
 </urlset>

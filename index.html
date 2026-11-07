@@ -55,6 +55,8 @@
     <nav class="tool-nav" aria-label="Main navigation">
       <a class="header-link" href="/" aria-current="page">Package XML Generator</a>
       <a class="header-link" href="./formula-formatter.html">Formula Formatter</a>
+      <a class="header-link" href="./permission-diff.html">Permission Diff</a>
+          <a class="header-link" href="./about.html">About</a>
     </nav>
   </header>
 
@@ -134,47 +136,7 @@
       </div>
       <p class="disclaimer">This tool checks manifest structure and common issues locally. It cannot confirm that components exist in your org or guarantee deployment success.</p>
     </section>
-    <section class="companion-secondary companion-feature-promo" aria-labelledby="companion-secondary-title">
-  <div class="companion-promo-header">
-    <div class="companion-secondary-mark" aria-hidden="true">
-      <svg viewBox="0 0 48 48" role="img" aria-label="Chrome-style icon">
-        <circle cx="24" cy="24" r="22" fill="#fff"/>
-        <path d="M24 24 5.2 24A19 19 0 0 0 38.5 34.5Z" fill="#34A853"/>
-        <path d="M24 24 38.5 34.5A19 19 0 0 0 14.5 7.5Z" fill="#FBBC05"/>
-        <path d="M24 24 14.5 7.5A19 19 0 0 0 5.2 24Z" fill="#EA4335"/>
-        <circle cx="24" cy="24" r="9.5" fill="#4285F4" stroke="#fff" stroke-width="2.5"/>
-      </svg>
-    </div>
-    <div class="companion-promo-heading">
-      <span class="companion-eyebrow">FOR SALESFORCE ADMINS &amp; DEVELOPERS</span>
-      <h2 id="companion-secondary-title">Meet Salesforce Companion</h2>
-      <p class="companion-promo-subtitle">Your productivity sidebar for Salesforce</p>
-    </div>
-  </div>
-  <p class="companion-promo-description">Spend less time navigating Setup and more time getting things done. Find fields and API names, generate SOQL queries, jump to frequently used tools, and identify your Salesforce environment—all from a handy sidebar inside Salesforce.</p>
-  <div class="companion-feature-grid">
-    <div class="companion-feature">
-      <span class="companion-feature-icon" aria-hidden="true">⌕</span>
-      <div><strong>Instant field search</strong><span>Find objects, fields, and API names quickly.</span></div>
-    </div>
-    <div class="companion-feature">
-      <span class="companion-feature-icon" aria-hidden="true">&lt;/&gt;</span>
-      <div><strong>SOQL generator</strong><span>Build queries for the current record.</span></div>
-    </div>
-    <div class="companion-feature">
-      <span class="companion-feature-icon" aria-hidden="true">↗</span>
-      <div><strong>Quick navigation</strong><span>Open Setup tools and Developer Console faster.</span></div>
-    </div>
-    <div class="companion-feature">
-      <span class="companion-feature-icon" aria-hidden="true">◉</span>
-      <div><strong>Environment awareness</strong><span>Know when you're in Production, Sandbox, or Developer Edition.</span></div>
-    </div>
-  </div>
-  <div class="companion-promo-footer">
-    <span class="companion-promo-note">Chrome extension · Opens in the Chrome Web Store</span>
-    <a class="companion-secondary-button" href="https://chromewebstore.google.com/detail/salesforce-companion/apmdmekheggcegdfhlnkcpmmaahhdmol?hl=en" target="_blank" rel="noopener noreferrer">Try Salesforce Companion <span aria-hidden="true">↗</span></a>
-  </div>
-</section>
+    
 
     <section class="faq-section" id="faq"><div class="section-intro"><span class="eyebrow">HELP &amp; GUIDANCE</span><h2>Frequently asked questions</h2><p>Quick answers for creating and using Salesforce metadata manifests.</p></div><div class="faq-list">
       <details class="faq-item"><summary>What if I can’t find a metadata type?</summary><p>You can add a metadata type entry to the XML after generation. Use the exact API name documented by Salesforce’s Metadata API and follow the structure of the other <code>&lt;types&gt;</code> entries. Confirm that the type is supported by your selected API version.</p></details>

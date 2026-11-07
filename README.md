@@ -56,3 +56,12 @@ In destructive-changes mode, imported members become deletion targets. The modal
 Open `formula-formatter.html` to format Salesforce formula expressions in the browser. Formatting updates automatically as you type or paste. The page includes syntax highlighting, nested function expand/collapse, output copying, and character/line counts. It does not connect to Salesforce, evaluate formulas against an org, or guarantee that an expression is valid for every Salesforce formula context.
 
 The formatter is implemented with plain JavaScript and has no runtime dependencies. Its source input is processed in the page; the page contains no analytics or remote formatter script.
+
+
+## Permission Diff Checker
+The `permission-diff.html` page compares two Salesforce Profile XML files or two Permission Set XML files. Supporting files: `permission-diff.css` and `permission-diff.js`. The comparison runs locally in the browser.
+
+
+## About page
+
+`about.html` introduces PackageXML.dev, links to the three browser-based tools, and presents Salesforce Companion in one central location. The shared navigation links to the About page from every page.
