@@ -1,1 +1,803 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>50 Real Salesforce package.xml Examples (API Names &amp; XML)</title>
+<meta name="description" content="Explore 50 practical Salesforce package.xml examples for Apex, Flows, LWC, custom objects, fields, security, reports and more. Copy and adapt real Metadata API names.">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://packagexml.dev/blog/50-salesforce-package-xml-examples.html">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="stylesheet" href="../styles.css">
+<meta property="og:type" content="article">
+<meta property="og:title" content="50 Real Salesforce package.xml Examples">
+<meta property="og:description" content="Practical package.xml snippets for common Salesforce metadata types, using their exact Metadata API names.">
+<meta property="og:url" content="https://packagexml.dev/blog/50-salesforce-package-xml-examples.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="50 Real Salesforce package.xml Examples">
+<meta name="twitter:description" content="Copy and adapt 50 Salesforce package.xml examples for common metadata types.">
+<style>
+.guide-main{max-width:850px;margin:0 auto;padding:42px 22px 64px;background:#fff;color:#25364b;font:16px/1.75 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.guide-main a{color:#1769c2;text-underline-offset:3px}
+.guide-main .eyebrow{display:block;color:#0b5cab;font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.guide-main h1,.guide-main h2,.guide-main h3{color:#152943;line-height:1.25;letter-spacing:-.025em}
+.guide-main h1{font-size:clamp(2rem,5vw,3rem);margin:12px 0}
+.guide-main h2{font-size:1.55rem;margin:38px 0 12px}
+.guide-main h3{font-size:1.12rem;margin:28px 0 7px}
+.guide-main .dek{font-size:1.15rem;color:#53677f;margin:0}
+.guide-main .byline{font-size:13px;color:#53677f;margin:16px 0 24px}
+.guide-main .cta{display:inline-block;background:#1769c2;color:#fff;text-decoration:none;font-weight:800;padding:11px 16px;border-radius:8px;margin:4px 0 18px}
+.guide-main .callout{background:#f3f7fb;border:1px solid #dce5ef;border-left:4px solid #1769c2;padding:16px 18px;border-radius:9px;margin:22px 0}
+.guide-main pre{overflow:auto;background:#101e30;color:#e7f0ff;border-radius:10px;padding:16px;font-size:13px;line-height:1.6;margin:12px 0 18px}
+.guide-main code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.guide-main p code{background:#edf3f9;color:#183451;border-radius:4px;padding:2px 5px}
+.guide-main .note{font-size:14px;color:#53677f}
+.guide-main .toc{background:#f7f9fc;border:1px solid #dce5ef;border-radius:10px;padding:18px 22px;margin:24px 0}
+.guide-main .toc ol{columns:2;column-gap:32px;margin:10px 0 0;padding-left:22px}
+.guide-main .toc li{break-inside:avoid;margin:3px 0;font-size:14px}
+.guide-main .example{padding-top:2px;scroll-margin-top:20px}
+.guide-main .xml-example-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.guide-main .copy-toast{display:inline-flex;align-items:center;gap:8px;margin-left:10px;padding:6px 10px;border:1px solid #b9e4ca;border-radius:7px;background:#eaf8ef;color:#17633a;font-size:13px;font-weight:700;line-height:1.35;opacity:0;visibility:hidden;transform:translateY(4px);transition:opacity .16s ease,transform .16s ease,visibility .16s ease;pointer-events:none}
+.guide-main .copy-toast.is-visible{opacity:1;visibility:visible;transform:translateY(0)}
+.guide-main .copy-toast-icon{display:inline-grid;place-items:center;width:17px;height:17px;border-radius:50%;background:#d0f0dc;font-size:12px;line-height:1}
+@media(prefers-reduced-motion:reduce){.guide-main .copy-toast{transition:none}}
+@media(max-width:600px){.guide-main{padding:30px 18px 48px}.guide-main .dek{font-size:1.03rem}.guide-main .toc ol{columns:1}.guide-main pre{font-size:12px;padding:13px}}
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Article","headline":"50 Real Salesforce package.xml Examples","description":"50 practical Salesforce package.xml examples using Metadata API type names and realistic component member names.","mainEntityOfPage":{"@type":"WebPage","@id":"https://packagexml.dev/blog/50-salesforce-package-xml-examples.html"},"author":{"@type":"Person","name":"Shubham Lashkan","url":"https://shubhamlashkan.com/"},"publisher":{"@type":"Organization","name":"packagexml.dev","url":"https://packagexml.dev/"},"datePublished":"2026-11-15","dateModified":"2026-11-15"}
+</script>
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="../" aria-label="Salesforce Package XML Generator home">
+    <span class="brand-mark" aria-hidden="true">&lt;/&gt;</span>
+    <span><strong>Package XML</strong><small>Salesforce Developer Tool</small></span>
+  </a>
+  <nav class="tool-nav" aria-label="Main navigation">
+    <a class="header-link" href="../about.html">About</a>
+    <a class="header-link" href="../">Package XML Generator</a>
+    <a class="header-link" href="../formula-formatter.html">Formula Formatter</a>
+    <a class="header-link" href="../permission-diff.html">Permission Diff</a>
+  </nav>
+</header>
+<main class="guide-main">
+<article>
+<div class="eyebrow">Salesforce Developer Reference</div>
+<h1>50 Real Salesforce <code>package.xml</code> Examples</h1>
+<p class="dek">Copy-ready manifest examples for Apex, Flows, Lightning Web Components, objects, fields, security, reports, and everyday Salesforce metadata work.</p>
+<p class="byline">By <a href="https://shubhamlashkan.com/">Shubham Lashkan</a> · Updated November 15, 2026</p>
+<a class="cta" href="../">Generate a package.xml manifest →</a>
+<p>A Salesforce <code>package.xml</code> manifest tells the Metadata API which metadata component types and members to retrieve or deploy. The <code>&lt;name&gt;</code> value must be the Metadata API type name—not simply the label shown in Setup—and each <code>&lt;members&gt;</code> value must use the component's Metadata API full name.</p>
+<div class="callout"><strong>Before you copy an example:</strong> Component names such as <code>Invoice__c</code> and <code>InvoiceService</code> are illustrative; replace them with names from your org. Examples use Metadata API version <code>68.0</code>. Use a version supported by your Salesforce org and deployment tooling. The current generator's default is <code>66.0</code>; you can change its version field when generating a manifest.</div>
+<h2>How to use these examples</h2>
+<ol>
+<li>Find the metadata type and member pattern that matches your task.</li>
+<li>Replace each sample member with the exact API/full name from your Salesforce org.</li>
+<li>Keep separate <code>&lt;types&gt;</code> blocks for separate metadata types.</li>
+<li>Validate component names, dependencies, permissions, and API-version compatibility before deploying.</li>
+</ol>
+<div class="toc"><strong>Jump to an example</strong><ol>
+<li><a href="#example-1">Retrieve every Apex class</a></li><li><a href="#example-2">Retrieve one Apex class</a></li><li><a href="#example-3">Retrieve multiple Apex classes</a></li><li><a href="#example-4">Retrieve every Apex trigger</a></li><li><a href="#example-5">Retrieve a specific Apex trigger</a></li><li><a href="#example-6">Retrieve a Visualforce page</a></li><li><a href="#example-7">Retrieve a Visualforce component</a></li><li><a href="#example-8">Retrieve an Apex test suite</a></li><li><a href="#example-9">Retrieve an Aura bundle</a></li><li><a href="#example-10">Retrieve a Lightning web component</a></li><li><a href="#example-11">Retrieve all Lightning web components</a></li><li><a href="#example-12">Retrieve a static resource</a></li><li><a href="#example-13">Retrieve a custom object</a></li><li><a href="#example-14">Retrieve a standard object definition</a></li><li><a href="#example-15">Retrieve a custom field</a></li><li><a href="#example-16">Retrieve a standard-object field</a></li><li><a href="#example-17">Retrieve a validation rule</a></li><li><a href="#example-18">Retrieve a record type</a></li><li><a href="#example-19">Retrieve a page layout</a></li><li><a href="#example-20">Retrieve a list view</a></li><li><a href="#example-21">Retrieve a custom tab</a></li><li><a href="#example-22">Retrieve a custom application</a></li><li><a href="#example-23">Retrieve a flow</a></li><li><a href="#example-24">Retrieve multiple flows</a></li><li><a href="#example-25">Retrieve a legacy flow definition (older API workflows)</a></li><li><a href="#example-26">Retrieve a workflow rule</a></li><li><a href="#example-27">Retrieve a permission set</a></li><li><a href="#example-28">Retrieve a permission set group</a></li><li><a href="#example-29">Retrieve a profile</a></li><li><a href="#example-30">Retrieve a custom permission</a></li><li><a href="#example-31">Retrieve sharing rules for an object</a></li><li><a href="#example-32">Retrieve a queue</a></li><li><a href="#example-33">Retrieve a public group</a></li><li><a href="#example-34">Retrieve a custom metadata record</a></li><li><a href="#example-35">Retrieve a second custom metadata record</a></li><li><a href="#example-36">Retrieve a custom label</a></li><li><a href="#example-37">Retrieve a global value set</a></li><li><a href="#example-38">Retrieve an email template</a></li><li><a href="#example-39">Retrieve a report</a></li><li><a href="#example-40">Retrieve a dashboard</a></li><li><a href="#example-41">Retrieve a remote site setting</a></li><li><a href="#example-42">Retrieve a named credential</a></li><li><a href="#example-43">Retrieve a connected app</a></li><li><a href="#example-44">Retrieve code for a release</a></li><li><a href="#example-45">Retrieve a UI bundle set</a></li><li><a href="#example-46">Retrieve an object and its fields</a></li><li><a href="#example-47">Retrieve fields and validation rules</a></li><li><a href="#example-48">Retrieve automation components</a></li><li><a href="#example-49">Retrieve reports and dashboards</a></li><li><a href="#example-50">Build a mixed deployment manifest</a></li>
+</ol></div>
+<h2>50 package.xml examples</h2>
+<section class="example" id="example-1">
+  <h3>1. Retrieve every Apex class</h3>
+  <p>Use the wildcard to request all Apex classes. This is useful for a broad code review or a full source retrieval.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;*&lt;/members&gt;
+        &lt;name&gt;ApexClass&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-2">
+  <h3>2. Retrieve one Apex class</h3>
+  <p>Replace the sample name with the Apex class API name in your org.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;InvoiceService&lt;/members&gt;
+        &lt;name&gt;ApexClass&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-3">
+  <h3>3. Retrieve multiple Apex classes</h3>
+  <p>List each class as a separate member when you only need a small, known set.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;InvoiceService&lt;/members&gt;
+        &lt;members&gt;TaxCalculator&lt;/members&gt;
+        &lt;members&gt;AccountSelector&lt;/members&gt;
+        &lt;name&gt;ApexClass&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-4">
+  <h3>4. Retrieve every Apex trigger</h3>
+  <p>Use this when you need all trigger components for an audit or migration.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;*&lt;/members&gt;
+        &lt;name&gt;ApexTrigger&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-5">
+  <h3>5. Retrieve a specific Apex trigger</h3>
+  <p>The member is the trigger API name, without the .trigger file extension.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;InvoiceTrigger&lt;/members&gt;
+        &lt;name&gt;ApexTrigger&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-6">
+  <h3>6. Retrieve a Visualforce page</h3>
+  <p>Visualforce pages use the ApexPage metadata type.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;InvoiceSummary&lt;/members&gt;
+        &lt;name&gt;ApexPage&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-7">
+  <h3>7. Retrieve a Visualforce component</h3>
+  <p>Visualforce components use ApexComponent.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;InvoiceHeader&lt;/members&gt;
+        &lt;name&gt;ApexComponent&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-8">
+  <h3>8. Retrieve an Apex test suite</h3>
+  <p>Use the test suite's API name as the member.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;ReleaseSmokeTests&lt;/members&gt;
+        &lt;name&gt;ApexTestSuite&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-9">
+  <h3>9. Retrieve an Aura bundle</h3>
+  <p>Aura bundle names are case-sensitive and do not include a file extension.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;invoicePanel&lt;/members&gt;
+        &lt;name&gt;AuraDefinitionBundle&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-10">
+  <h3>10. Retrieve a Lightning web component</h3>
+  <p>Use the LWC bundle name, not an individual JavaScript or HTML filename.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;invoiceSummary&lt;/members&gt;
+        &lt;name&gt;LightningComponentBundle&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-11">
+  <h3>11. Retrieve all Lightning web components</h3>
+  <p>The wildcard retrieves all bundles of this type where wildcard retrieval is supported.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;*&lt;/members&gt;
+        &lt;name&gt;LightningComponentBundle&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-12">
+  <h3>12. Retrieve a static resource</h3>
+  <p>Use the static resource name, without its file extension.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;BrandAssets&lt;/members&gt;
+        &lt;name&gt;StaticResource&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-13">
+  <h3>13. Retrieve a custom object</h3>
+  <p>Custom object API names include the __c suffix.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Invoice__c&lt;/members&gt;
+        &lt;name&gt;CustomObject&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-14">
+  <h3>14. Retrieve a standard object definition</h3>
+  <p>Standard object names can also be specified with CustomObject.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Account&lt;/members&gt;
+        &lt;name&gt;CustomObject&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-15">
+  <h3>15. Retrieve a custom field</h3>
+  <p>For a field, qualify the field API name with its parent object API name.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Invoice__c.External_Reference__c&lt;/members&gt;
+        &lt;name&gt;CustomField&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-16">
+  <h3>16. Retrieve a standard-object field</h3>
+  <p>The same Object.Field member format applies to standard objects.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Account.Customer_Tier__c&lt;/members&gt;
+        &lt;name&gt;CustomField&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-17">
+  <h3>17. Retrieve a validation rule</h3>
+  <p>Validation rule members use Object.RuleName.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Invoice__c.Require_Invoice_Number&lt;/members&gt;
+        &lt;name&gt;ValidationRule&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-18">
+  <h3>18. Retrieve a record type</h3>
+  <p>Record type members use Object.RecordTypeDeveloperName.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Account.Business_Account&lt;/members&gt;
+        &lt;name&gt;RecordType&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-19">
+  <h3>19. Retrieve a page layout</h3>
+  <p>Layout members use Object-Layout Label. Use the exact layout full name from your org.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Account-Invoice Account Layout&lt;/members&gt;
+        &lt;name&gt;Layout&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-20">
+  <h3>20. Retrieve a list view</h3>
+  <p>List view members use Object.ListViewDeveloperName.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Account.My_Open_Accounts&lt;/members&gt;
+        &lt;name&gt;ListView&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-21">
+  <h3>21. Retrieve a custom tab</h3>
+  <p>A custom object tab uses the object's API name as its member.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Invoice__c&lt;/members&gt;
+        &lt;name&gt;CustomTab&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-22">
+  <h3>22. Retrieve a custom application</h3>
+  <p>Use the application's developer/API name, not its displayed label.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Sales_Console&lt;/members&gt;
+        &lt;name&gt;CustomApplication&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-23">
+  <h3>23. Retrieve a flow</h3>
+  <p>Use the flow API name. Do not append a version number to the member.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Invoice_After_Save&lt;/members&gt;
+        &lt;name&gt;Flow&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-24">
+  <h3>24. Retrieve multiple flows</h3>
+  <p>List each flow API name separately to retrieve a selected group of automations.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Invoice_After_Save&lt;/members&gt;
+        &lt;members&gt;Update_Account_Health&lt;/members&gt;
+        &lt;name&gt;Flow&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-25">
+  <h3>25. Retrieve a legacy flow definition (older API workflows)</h3>
+  <p>FlowDefinition appears in the generator catalog for compatibility with older Metadata API workflows. For API version 44.0 and later, Flow metadata no longer requires FlowDefinition; prefer the Flow examples above.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Invoice_After_Save&lt;/members&gt;
+        &lt;name&gt;FlowDefinition&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-26">
+  <h3>26. Retrieve a workflow rule</h3>
+  <p>Workflow rule members use Object.RuleDeveloperName.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Account.Set_Default_Region&lt;/members&gt;
+        &lt;name&gt;WorkflowRule&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-27">
+  <h3>27. Retrieve a permission set</h3>
+  <p>Use the permission set API name, not its label.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Invoice_Operations&lt;/members&gt;
+        &lt;name&gt;PermissionSet&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-28">
+  <h3>28. Retrieve a permission set group</h3>
+  <p>Use the permission set group's developer/API name.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Invoice_Operations_Group&lt;/members&gt;
+        &lt;name&gt;PermissionSetGroup&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-29">
+  <h3>29. Retrieve a profile</h3>
+  <p>Use the profile metadata full name. The standard System Administrator profile is commonly represented as Admin.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Admin&lt;/members&gt;
+        &lt;name&gt;Profile&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-30">
+  <h3>30. Retrieve a custom permission</h3>
+  <p>Use the custom permission developer name.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Approve_Invoice&lt;/members&gt;
+        &lt;name&gt;CustomPermission&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-31">
+  <h3>31. Retrieve sharing rules for an object</h3>
+  <p>SharingRules is the metadata type name (plural). The member identifies the object whose sharing rules are included.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Account&lt;/members&gt;
+        &lt;name&gt;SharingRules&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-32">
+  <h3>32. Retrieve a queue</h3>
+  <p>Use the queue's developer/API name.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Invoice_Support&lt;/members&gt;
+        &lt;name&gt;Queue&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-33">
+  <h3>33. Retrieve a public group</h3>
+  <p>Group is used for public groups in this metadata context. Use its developer/API name.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Invoice_Reviewers&lt;/members&gt;
+        &lt;name&gt;Group&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-34">
+  <h3>34. Retrieve a custom metadata record</h3>
+  <p>CustomMetadata members use TypeDeveloperName.RecordDeveloperName. The __mdt suffix is omitted from the type portion.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Invoice_Settings.Default&lt;/members&gt;
+        &lt;name&gt;CustomMetadata&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-35">
+  <h3>35. Retrieve a second custom metadata record</h3>
+  <p>Use the custom metadata type developer name followed by the record developer name.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Integration_Config.ERP&lt;/members&gt;
+        &lt;name&gt;CustomMetadata&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-36">
+  <h3>36. Retrieve a custom label</h3>
+  <p>Use the custom label's API/developer name.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Invoice_Due_Date&lt;/members&gt;
+        &lt;name&gt;CustomLabel&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-37">
+  <h3>37. Retrieve a global value set</h3>
+  <p>Use the global value set developer name.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Invoice_Status_Values&lt;/members&gt;
+        &lt;name&gt;GlobalValueSet&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-38">
+  <h3>38. Retrieve an email template</h3>
+  <p>Email template members include the folder and template developer name. Verify the exact full name in your org.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;unfiled$public/Invoice_Notice&lt;/members&gt;
+        &lt;name&gt;EmailTemplate&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-39">
+  <h3>39. Retrieve a report</h3>
+  <p>Report members include the report folder and report developer name.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Finance/Outstanding_Invoices&lt;/members&gt;
+        &lt;name&gt;Report&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-40">
+  <h3>40. Retrieve a dashboard</h3>
+  <p>Dashboard members include the dashboard folder and dashboard developer name.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Finance/Invoice_Overview&lt;/members&gt;
+        &lt;name&gt;Dashboard&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-41">
+  <h3>41. Retrieve a remote site setting</h3>
+  <p>Use the remote site setting developer name.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;ERP_Endpoint&lt;/members&gt;
+        &lt;name&gt;RemoteSiteSetting&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-42">
+  <h3>42. Retrieve a named credential</h3>
+  <p>Use the named credential developer name. Credential setup and authentication are handled separately from the manifest.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;ERP_Named_Credential&lt;/members&gt;
+        &lt;name&gt;NamedCredential&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-43">
+  <h3>43. Retrieve a connected app</h3>
+  <p>Use the connected app's developer/API name.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Internal_Invoice_Integration&lt;/members&gt;
+        &lt;name&gt;ConnectedApp&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-44">
+  <h3>44. Retrieve code for a release</h3>
+  <p>Combine multiple <types> blocks when a release includes classes and triggers.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;InvoiceService&lt;/members&gt;
+        &lt;members&gt;TaxCalculator&lt;/members&gt;
+        &lt;name&gt;ApexClass&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;types&gt;
+        &lt;members&gt;InvoiceTrigger&lt;/members&gt;
+        &lt;name&gt;ApexTrigger&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-45">
+  <h3>45. Retrieve a UI bundle set</h3>
+  <p>This example requests a Lightning web component and an Aura bundle in one manifest.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;invoiceSummary&lt;/members&gt;
+        &lt;name&gt;LightningComponentBundle&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;types&gt;
+        &lt;members&gt;invoicePanel&lt;/members&gt;
+        &lt;name&gt;AuraDefinitionBundle&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-46">
+  <h3>46. Retrieve an object and its fields</h3>
+  <p>CustomObject and CustomField are separate metadata types. Include both when you need the object definition and selected fields.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Invoice__c&lt;/members&gt;
+        &lt;name&gt;CustomObject&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;types&gt;
+        &lt;members&gt;Invoice__c.External_Reference__c&lt;/members&gt;
+        &lt;name&gt;CustomField&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-47">
+  <h3>47. Retrieve fields and validation rules</h3>
+  <p>Use fully qualified Object.Field and Object.Rule member names.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Invoice__c.External_Reference__c&lt;/members&gt;
+        &lt;name&gt;CustomField&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;types&gt;
+        &lt;members&gt;Invoice__c.Require_Invoice_Number&lt;/members&gt;
+        &lt;name&gt;ValidationRule&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-48">
+  <h3>48. Retrieve automation components</h3>
+  <p>Flows and workflow rules use different metadata types and member naming conventions.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Invoice_After_Save&lt;/members&gt;
+        &lt;name&gt;Flow&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;types&gt;
+        &lt;members&gt;Account.Set_Default_Region&lt;/members&gt;
+        &lt;name&gt;WorkflowRule&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-49">
+  <h3>49. Retrieve reports and dashboards</h3>
+  <p>Folder-qualified member names identify the report and dashboard components.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;Finance/Outstanding_Invoices&lt;/members&gt;
+        &lt;name&gt;Report&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;types&gt;
+        &lt;members&gt;Finance/Invoice_Overview&lt;/members&gt;
+        &lt;name&gt;Dashboard&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<section class="example" id="example-50">
+  <h3>50. Build a mixed deployment manifest</h3>
+  <p>A single manifest can contain multiple metadata types. Confirm dependencies and component availability in the target org.</p>
+  <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;Package xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    &lt;types&gt;
+        &lt;members&gt;InvoiceService&lt;/members&gt;
+        &lt;members&gt;TaxCalculator&lt;/members&gt;
+        &lt;name&gt;ApexClass&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;types&gt;
+        &lt;members&gt;Invoice_Operations&lt;/members&gt;
+        &lt;name&gt;PermissionSet&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;types&gt;
+        &lt;members&gt;Invoice_Due_Date&lt;/members&gt;
+        &lt;name&gt;CustomLabel&lt;/name&gt;
+    &lt;/types&gt;
+    &lt;version&gt;68.0&lt;/version&gt;
+&lt;/Package&gt;</code></pre>
+</section>
+<h2>Important naming and retrieval notes</h2>
+<ul>
+<li><strong>Custom fields:</strong> use <code>ObjectApiName.FieldApiName</code>, for example <code>Invoice__c.External_Reference__c</code>.</li>
+<li><strong>Validation rules and record types:</strong> qualify the component with its object, such as <code>Invoice__c.Require_Invoice_Number</code>.</li>
+<li><strong>Reports, dashboards, and email templates:</strong> include the folder in the member full name where required.</li>
+<li><strong>Custom metadata records:</strong> use <code>TypeDeveloperName.RecordDeveloperName</code>; the custom metadata type's <code>__mdt</code> suffix is not included in the type portion of the record member.</li>
+<li><strong>Sharing rules:</strong> the Metadata API type is <code>SharingRules</code> (plural), not <code>SharingRule</code>.</li>
+<li><strong>Profiles:</strong> use the profile metadata full name, which can differ from the profile label shown in Setup.</li>
+<li><strong>Wildcards:</strong> <code>*</code> is supported only for metadata types that allow wildcard retrieval. Check the Salesforce Metadata Types reference before relying on it.</li>
+</ul>
+<div class="callout"><strong>Want to build your own manifest?</strong><p>Choose metadata types, enter component API names, and generate your XML without assembling the blocks manually.</p><a class="cta" href="../">Open the free package.xml generator →</a></div>
+<h2>Related guide</h2>
+<p>New to package.xml? Read <a href="./salesforce-package-xml-generator.html">How to Create a Salesforce package.xml File Online</a> for a step-by-step introduction.</p>
+<p class="note">These examples show manifest structure and member naming patterns. A successful retrieve or deployment also depends on whether the component exists, API-version support, user permissions, dependencies, and the target org's configuration.</p>
+</article>
+</main>
+<footer class="site-footer">
+  <p>Developed using AI by <a href="https://shubhamlashkan.com/" target="_blank" rel="noopener noreferrer">Shubham Lashkan</a></p>
+  <span>Built for the Salesforce developer community</span>
+  <a class="coffee-support-link" href="https://buymeacoffee.com/shubhamlashkan" target="_blank" rel="noopener noreferrer" aria-label="Support this free tool on Buy Me a Coffee"><span class="coffee-cup-icon" aria-hidden="true">☕</span> Buy me a coffee</a>
+</footer>
 
+<script>
+(() => {
+  "use strict";
+  document.querySelectorAll(".guide-main pre").forEach((pre, index) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "xml-example-code";
+    wrapper.dataset.example = String(index + 1);
+    pre.parentNode.insertBefore(wrapper, pre);
+    const toolbar = document.createElement("div");
+    toolbar.className = "xml-example-toolbar";
+    const label = document.createElement("span");
+    label.textContent = `XML example ${index + 1}`;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "xml-copy-button";
+    button.textContent = "Copy XML";
+    button.setAttribute("aria-label", `Copy XML example ${index + 1}`);
+    const toast = document.createElement("span");
+    toast.className = "copy-toast";
+    toast.setAttribute("role", "status");
+    toast.setAttribute("aria-live", "polite");
+    toast.innerHTML = '<span class="copy-toast-icon" aria-hidden="true">✓</span><span>XML copied</span>';
+    let toastTimer;
+    button.addEventListener("click", async () => {
+      const value = pre.textContent;
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(value);
+        } else {
+          const field = document.createElement("textarea");
+          field.value = value;
+          field.setAttribute("readonly", "");
+          field.style.position = "fixed";
+          field.style.opacity = "0";
+          document.body.appendChild(field);
+          field.select();
+          const copied = document.execCommand("copy");
+          field.remove();
+          if (!copied) throw new Error("Copy command failed");
+        }
+        button.textContent = "Copied!";
+        button.classList.add("is-copied");
+        toast.classList.add("is-visible");
+        window.clearTimeout(toastTimer);
+        toastTimer = window.setTimeout(() => toast.classList.remove("is-visible"), 2400);
+        window.setTimeout(() => {
+          button.textContent = "Copy XML";
+          button.classList.remove("is-copied");
+        }, 1800);
+      } catch (error) {
+        button.textContent = "Select XML";
+        button.title = "Automatic copying is unavailable. Select the XML and copy it manually.";
+      }
+    });
+    toolbar.append(label, button, toast);
+    wrapper.append(toolbar, pre);
+  });
+})();
+</script>
+
+</body>
+</html>
