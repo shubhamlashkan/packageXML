@@ -1145,6 +1145,25 @@
       color: #e0f2fe;
     }
   </style>
+  <!-- Google tag (gtag.js) - Rajwada Rush only -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HG116EGWKN"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HG116EGWKN');
+    // Rajwada Rush gameplay analytics. This only sends GA4 events; it does not alter game state.
+    function trackRajwadaEvent(eventName, eventParams) {
+      try {
+        if (typeof window.gtag === 'function') {
+          window.gtag('event', eventName, eventParams || {});
+        }
+      } catch (analyticsError) {
+        // Analytics must never interrupt gameplay.
+      }
+    }
+
+  </script>
 </head>
 <body>
   <div id="game-shell">
@@ -4190,6 +4209,11 @@
       }
 
       game.state = 'CAPTURED';
+      trackRajwadaEvent('police_capture', {
+        distance_m: Math.floor(Number(game.distance) || 0),
+        jeeravan_available: Math.floor(Number(game.jeeravanRun) || 0),
+        revive_available: !game.policeRevivesUsed
+      });
       audio.stopBgm();
 
       const overlay = document.getElementById('police-overlay');
@@ -4235,6 +4259,10 @@
 
       clearPoliceDecisionTimer();
       game.jeeravanRun -= 10;
+      trackRajwadaEvent('police_revive', {
+        jeeravan_spent: 10,
+        distance_m: Math.floor(Number(game.distance) || 0)
+      });
       game.policeRevivesUsed = true;
       game.policeActive = false;
       policeChaser.mesh.visible = false;
@@ -4266,6 +4294,9 @@
         clearDynamic3DEntities();
 
         game.state = 'PLAYING';
+        trackRajwadaEvent('game_start', {
+          character: ch.shortName || ch.id || 'unknown'
+        });
         game.score = 0;
         game.distance = 0;
         game.jeeravanRun = 0;
@@ -4429,6 +4460,14 @@
       const finalJeeravan = Math.max(0, Math.floor(Number(game.jeeravanRun) || 0));
       const finalCoins = Math.max(0, Math.floor(Number(game.coinsRun) || 0));
       const finalCombo = Math.max(1, Math.floor(Number(game.maxCombo) || 1));
+      trackRajwadaEvent('game_over', {
+        score: finalScore,
+        distance_m: finalDist,
+        jeeravan_collected: finalJeeravan,
+        coins_collected: finalCoins,
+        max_combo: finalCombo,
+        reason: String(reasonMsg || 'unknown').slice(0, 100)
+      });
 
       // Minimal, dependable game-over screen. This is deliberately done before
       // optional effects so a collision can never leave the player on a frozen run.
@@ -4849,6 +4888,10 @@
 
           if (laneMatch && (heightMatch || magnetActive)) {
             item.collected = true;
+            trackRajwadaEvent('pickup_collected', {
+              item_type: String(item.type || 'unknown'),
+              distance_m: Math.floor(Number(game.distance) || 0)
+            });
             if (item.type === 'jeeravan') {
               game.jeeravanRun++;
               audio.playJeeravan(1);
