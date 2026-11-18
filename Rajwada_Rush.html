@@ -3818,8 +3818,19 @@
 
     function spawnPoliceChallengeObstacle() {
       const lanes = [-1, 0, 1];
-      let choices = lanes.filter(lane => lane !== game.policeLastChallengeLane);
-      if (!choices.length) choices = lanes;
+      // Keep challenge hazards from spawning directly on top of regular traffic.
+      const occupiedLanes = new Set(
+        obstacles.filter(o => o.z > -145 && o.z < -70).map(o => o.lane)
+      );
+      let choices = lanes.filter(lane =>
+        lane !== game.policeLastChallengeLane && !occupiedLanes.has(lane)
+      );
+      if (!choices.length) {
+        choices = lanes.filter(lane => !occupiedLanes.has(lane));
+      }
+      // If all lanes are busy, retry shortly rather than overlap hazards or
+      // count a challenge obstacle that was never actually placed.
+      if (!choices.length) return false;
       const lane = choices[Math.floor(Math.random() * choices.length)];
       game.policeLastChallengeLane = lane;
 
@@ -3841,17 +3852,23 @@
         policeChallenge: true, collisionHandled: false
       });
       game.policeChallengesSpawned++;
+      return true;
     }
 
     function spawnWave() {
-      // The police sequence has its own controlled pothole pattern; keep normal
-      // traffic and collectible waves out of the way until the chase ends.
-      if (game.policeActive) return;
       const lanes = [-1, 0, 1];
       const types = ['pothole', 'banner', 'ibus', 'auto', 'bhandara'];
       const mainType = types[Math.floor(Math.random() * types.length)];
-      const mainLane = lanes[Math.floor(Math.random() * lanes.length)];
       const spawnZ = -112;
+
+      // During police chases, normal traffic and pickups continue alongside
+      // the scored police hazards. Choose a lane not already occupied near spawn.
+      const blockedLanes = game.policeActive
+        ? new Set(obstacles.filter(o => o.z > -145 && o.z < -70).map(o => o.lane))
+        : new Set();
+      const availableLanes = lanes.filter(lane => !blockedLanes.has(lane));
+      if (!availableLanes.length) return;
+      const mainLane = availableLanes[Math.floor(Math.random() * availableLanes.length)];
 
       // Magnet payoff: after a short delay, offer a compact coin sweep in all lanes.
       // The coins sit ahead of this obstacle wave so the reward is readable and collectible.
@@ -3890,7 +3907,7 @@
       });
 
       // Secondary obstacle at higher distances while keeping >=1 lane clear
-      if (game.distance > 320 && Math.random() < 0.45) {
+      if (!game.policeActive && game.distance > 320 && Math.random() < 0.45) {
         const remaining = lanes.filter((l) => l !== mainLane);
         const secondLane = remaining[Math.floor(Math.random() * remaining.length)];
         occupiedLanes.push(secondLane);
@@ -3930,7 +3947,9 @@
 
       // Indori Sikke are common currency; Jeeravan is deliberately rare.
       // One collectible trail per wave keeps the road readable.
-      const safeLanes = lanes.filter((l) => !occupiedLanes.includes(l));
+      const safeLanes = lanes.filter((l) =>
+        !occupiedLanes.includes(l) && !blockedLanes.has(l)
+      );
       if (safeLanes.length) {
         const roll = Math.random();
         const trailLane = safeLanes[Math.floor(Math.random() * safeLanes.length)];
@@ -3965,7 +3984,7 @@
         const chaiEligible = game.distance >= game.chaiNextSpawnDistance;
         const sevEligible = game.distance >= game.sevNextSpawnDistance;
         let pType = null;
-        if (chaiEligible && Math.random() < 0.10) pType = 'chai';
+        if (!game.policeActive && chaiEligible && Math.random() < 0.10) pType = 'chai';
         else if (sevEligible) pType = 'sev';
         if (pType) {
           const pLane = safeLanes[Math.floor(Math.random() * safeLanes.length)];
@@ -4022,7 +4041,7 @@
     function startPoliceChase() {
       if (game.state !== 'PLAYING' || game.policeActive) return;
       game.policeActive = true;
-      game.policeTimer = 23; // 5-second siren warning + 18-second escape challenge
+      game.policeTimer = 28; // 5-second siren warning + 23-second escape challenge
       game.policeGap = 65;
       game.policeElapsed = 0;
       // Clear ordinary traffic so the police sequence is predictable and fair.
@@ -4044,6 +4063,11 @@
       game.policeEscapeScore = 25;
       game.policeChallengeSpawnClock = 0.25;
       game.policeLastChallengeLane = null;
+      trackRajwadaEvent('police_chase_start', {
+        distance_m: Math.floor(Number(game.distance) || 0),
+        starting_escape_score: 25,
+        challenge_hazards: game.policeChallengeTotal
+      });
 
       policeChaser.elapsed = 0;
       policeChaser.mesh.visible = false;
@@ -4125,8 +4149,8 @@
       game.policeChallengeSpawnClock -= dt;
       if (game.policeChallengesSpawned < game.policeChallengeTotal &&
           game.policeChallengeSpawnClock <= 0) {
-        spawnPoliceChallengeObstacle();
-        game.policeChallengeSpawnClock = 1.05;
+        const challengeSpawned = spawnPoliceChallengeObstacle();
+        game.policeChallengeSpawnClock = challengeSpawned ? 1.05 : 0.18;
       }
 
       if (!policeArrived) {
@@ -4144,13 +4168,16 @@
       }
 
       // Escape score controls how close the officer gets: good manoeuvres create distance.
-      game.policeGap = Math.max(4, Math.min(100, 35 + (game.policeEscapeScore - 50) * 1.3));
+      // Keep a visible minimum gap so the officer never overlaps/vanishes behind
+      // the runner. Better escape scores make him fall farther back.
+      game.policeGap = Math.max(18, Math.min(100, 35 + (game.policeEscapeScore - 50) * 1.3));
+      policeChaser.mesh.visible = true;
       policeChaser.elapsed += dt;
       const approach = 1 - game.policeGap / 100;
       const targetX = player.visualX * LANE_WIDTH * .42;
       policeChaser.mesh.position.x += (targetX - policeChaser.mesh.position.x) * Math.min(1,dt*5.5);
       policeChaser.mesh.position.y = .025 + Math.abs(Math.sin(policeChaser.elapsed * 13)) * .07;
-      policeChaser.mesh.position.z = 4.7 - approach * 3.85;
+      policeChaser.mesh.position.z = 3.6 - approach * 1.6;
       policeChaser.mesh.rotation.z = Math.sin(policeChaser.elapsed * 8) * .055;
       const runParts = policeChaser.mesh.userData.runParts;
       if (runParts) {
@@ -4166,14 +4193,24 @@
       const timeEl = document.getElementById('police-chase-time');
       const fill = document.getElementById('police-chase-fill');
       const status = document.getElementById('police-chase-status');
-      if (timeEl) timeEl.textContent = `${Math.max(0, game.policeTimer).toFixed(1)}s`;
-      if (fill) fill.style.width = `${game.policeEscapeScore}%`;
-      if (status) status.textContent = `ESCAPE SCORE ${Math.round(game.policeEscapeScore)}/100 · NEED 60 TO ESCAPE · ${game.policeChallengesResolved}/${game.policeChallengeTotal} CLEARED`;
+      if (timeEl) timeEl.textContent = game.policeTimer > 0
+        ? `${game.policeTimer.toFixed(1)}s`
+        : 'CLEAR';
+      if (fill) fill.style.width = `${Math.max(0, Math.min(100, game.policeEscapeScore))}%`;
+      if (status) status.textContent = game.policeTimer <= 0 &&
+        game.policeChallengesResolved < game.policeChallengeTotal
+        ? `FINAL HAZARDS · ESCAPE SCORE ${Math.round(game.policeEscapeScore)}/100 · ${game.policeChallengesResolved}/${game.policeChallengeTotal} CLEARED`
+        : `ESCAPE SCORE ${Math.round(game.policeEscapeScore)}/100 · NEED 60 TO ESCAPE · ${game.policeChallengesResolved}/${game.policeChallengeTotal} CLEARED`;
 
       if (game.policeTimer <= 0 &&
           game.policeChallengesSpawned >= game.policeChallengeTotal &&
           game.policeChallengesResolved >= game.policeChallengeTotal) {
         if (game.policeEscapeScore >= 60) {
+          trackRajwadaEvent('police_chase_escape', {
+            distance_m: Math.floor(Number(game.distance) || 0),
+            escape_score: Math.round(game.policeEscapeScore),
+            hazards_cleared: game.policeChallengesResolved
+          });
           game.policeActive = false;
           policeChaser.mesh.visible = false;
           hidePoliceChaseHud();
@@ -4847,7 +4884,9 @@
       game.spawnTimer -= dt * (effectiveSpeed / game.baseSpeed);
       if (game.spawnTimer <= 0) {
         spawnWave();
-        game.spawnTimer = Math.max(0.56, 0.96 - game.distance * 0.00012);
+        game.spawnTimer = game.policeActive
+          ? Math.max(1.35, 1.65 - game.distance * 0.00005)
+          : Math.max(0.56, 0.96 - game.distance * 0.00012);
       }
 
       game.sceneryTimer -= effectiveSpeed * dt;
