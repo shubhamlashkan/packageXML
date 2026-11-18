@@ -290,6 +290,38 @@
     .jeeravan-counter-group, .coin-counter-group { display:flex; align-items:center; gap:6px; }
     .coin-badge { width:22px; height:22px; border-radius:50%; background:linear-gradient(135deg,#fde68a,#d97706); border:1px solid rgba(255,236,179,.85); color:#78350f; display:inline-flex; align-items:center; justify-content:center; font-size:13px; font-weight:900; }
     .hud-coin-num { font-size:1.02rem; font-weight:700; color:#fde68a; line-height:1; }
+    /* Optional in-run secret mission card; stays clear of the top HUD and controls. */
+    #mission-card {
+      position:absolute; z-index:24; left:50%; bottom:104px; transform:translateX(-50%);
+      width:min(278px,calc(100vw - 34px)); padding:9px 12px 10px;
+      border:1px solid rgba(255,209,102,.48); border-radius:15px;
+      color:#fff; background:linear-gradient(115deg,rgba(30,41,59,.94),rgba(88,45,12,.94));
+      box-shadow:0 8px 24px rgba(0,0,0,.28); pointer-events:none;
+      backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+    }
+    #mission-card.hidden { display:none; }
+    .mission-card-top { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .mission-card-kicker { color:#fcd34d; font:800 .58rem 'Outfit',sans-serif; letter-spacing:.14em; }
+    #mission-title { font:900 .82rem 'Outfit',sans-serif; }
+    #mission-description { margin-top:2px; color:rgba(255,255,255,.82); font-size:.68rem; font-weight:600; }
+    .mission-progress-row { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:7px; font:800 .66rem 'Outfit',sans-serif; }
+    #mission-progress-track { height:5px; margin-top:5px; overflow:hidden; border-radius:99px; background:rgba(255,255,255,.18); }
+    #mission-progress-fill { width:0%; height:100%; border-radius:99px; background:linear-gradient(90deg,#22c55e,#facc15); transition:width .18s ease; }
+    #mission-streak-mini { color:#fde68a; white-space:nowrap; }
+    #mission-time { color:#fde68a; font-weight:900; white-space:nowrap; }
+    #mission-reward-line { margin-top:5px; color:#86efac; font:800 .64rem 'Outfit',sans-serif; }
+    .mission-result-panel {
+      margin:12px 0 14px; padding:12px 14px; border-radius:16px;
+      border:1px solid rgba(255,209,102,.42); background:rgba(255,159,28,.10);
+      text-align:center;
+    }
+    .mission-result-title { color:#fde68a; font:900 .76rem 'Outfit',sans-serif; letter-spacing:.12em; }
+    #go-mission-result-text { margin-top:4px; color:#fff; font-size:.82rem; font-weight:700; }
+    #go-mission-reward { margin-top:5px; color:#86efac; font:900 .78rem 'Outfit',sans-serif; }
+    @media (max-height:620px) {
+      #mission-card { bottom:86px; transform:translateX(-50%) scale(.92); transform-origin:bottom center; }
+    }
+
     #police-chase-banner {
       position:absolute; z-index:35; top:112px; left:50%; transform:translateX(-50%);
       width:min(300px, calc(100vw - 32px)); padding:9px 13px 10px;
@@ -1245,6 +1277,22 @@
         </div>
       </div>
 
+      <div id="mission-card" class="hidden" aria-live="polite">
+        <div class="mission-card-top">
+          <span class="mission-card-kicker">SECRET MISSION</span>
+          <span id="mission-streak-mini">🔥 STREAK 0</span>
+        </div>
+        <div id="mission-title">CHAI KA DEEWANA</div>
+        <div id="mission-description">Complete your challenge this run.</div>
+        <div class="mission-progress-row">
+          <span id="mission-status">Progress</span>
+          <span id="mission-count">0 / 0</span>
+          <span id="mission-time">60s</span>
+        </div>
+        <div id="mission-progress-track"><div id="mission-progress-fill"></div></div>
+        <div id="mission-reward-line">REWARD · 25 INDOORI SIKKE</div>
+      </div>
+
       <!-- Non-Blocking Kinetic Zone Transition Toast -->
       <div id="zone-toast">
         <span class="toast-dot"></span>
@@ -1305,6 +1353,10 @@
           <div class="glass-capsule stat-chip">
             <span>🪙 Indori Sikke</span>
             <strong id="menu-total-coins" class="tabular">0</strong>
+          </div>
+          <div class="glass-capsule stat-chip">
+            <span>🔥 Mission Streak</span>
+            <strong id="menu-mission-streak" class="tabular">0</strong>
           </div>
         </div>
         <button type="button" id="btn-mute-menu" class="icon-glass-btn" style="width:40px;height:40px;" aria-label="Toggle Sound">🔊</button>
@@ -1443,6 +1495,12 @@
             <div class="metric-lbl">🔥 Max Combo</div>
             <div id="go-max-combo" class="tabular metric-val gold">x1</div>
           </div>
+        </div>
+
+        <div class="mission-result-panel">
+          <div class="mission-result-title">INDORE MYSTERY MISSION</div>
+          <div id="go-mission-result-text">Mission result will appear here.</div>
+          <div id="go-mission-reward"></div>
         </div>
 
         <!-- Actions & Share on X -->
@@ -3518,6 +3576,255 @@
     let floatingBadges = [];
     let toastTimeout = null;
 
+    // Local-only rotating missions. Data-driven catalogue; all mission time uses active gameplay time.
+    const MISSION_STREAK_KEY = 'rajwada_rush_mission_streak_v1';
+    const MISSION_COOLDOWN_SECONDS = 30;
+    const MISSION_COMPLETE_DISPLAY_SECONDS = 2.5;
+    const MISSION_DEFS = [
+      { id:'coins_8', action:'coins', title:'COIN SETH', description:'Collect 8 Indori Sikke.', target:8, unit:'coins', seconds:55, rewardCoins:25, difficulty:1, minDist:0 },
+      { id:'coins_15', action:'coins', title:'SIKKE JAMAA KARO', description:'Collect 15 Indori Sikke.', target:15, unit:'coins', seconds:70, rewardCoins:45, difficulty:2, minDist:450 },
+      { id:'dodges_8', action:'dodges', title:'TRAFFIC KA BAAP', description:'Cleanly dodge 8 obstacles.', target:8, unit:'dodges', seconds:55, rewardCoins:35, difficulty:1, minDist:0 },
+      { id:'dodges_14', action:'dodges', title:'MASTER OF THE ROAD', description:'Cleanly dodge 14 obstacles.', target:14, unit:'dodges', seconds:75, rewardCoins:65, difficulty:2, minDist:700 },
+      { id:'jumps_6', action:'jumps', title:'HAWA MEIN BHIYA', description:'Perform 6 jumps.', target:6, unit:'jumps', seconds:55, rewardCoins:30, difficulty:1, minDist:0 },
+      { id:'jumps_10', action:'jumps', title:'INDORI SKY KING', description:'Perform 10 jumps.', target:10, unit:'jumps', seconds:70, rewardCoins:55, difficulty:2, minDist:600 },
+      { id:'slides_6', action:'slides', title:'SLIDE MAARO BHIYA', description:'Perform 6 slides.', target:6, unit:'slides', seconds:55, rewardCoins:30, difficulty:1, minDist:0 },
+      { id:'slides_10', action:'slides', title:'SLIDE USTAAD', description:'Perform 10 slides.', target:10, unit:'slides', seconds:70, rewardCoins:55, difficulty:2, minDist:600 },
+      { id:'distance_650', action:'distance', title:'INDORE EXPRESS', description:'Cover 650 metres before time runs out.', target:650, unit:'m', seconds:65, rewardCoins:50, difficulty:2, minDist:250 },
+      { id:'distance_1100', action:'distance', title:'RAJWADA ROCKET', description:'Cover 1,100 metres before time runs out.', target:1100, unit:'m', seconds:85, rewardCoins:75, difficulty:3, minDist:1200 },
+      { id:'distance_1600', action:'distance', title:'MALWA MARATHON', description:'Cover 1,600 metres before time runs out.', target:1600, unit:'m', seconds:105, rewardCoins:100, difficulty:4, minDist:2600 },
+      { id:'coins_20_hard', action:'coins', title:'SIKKE KA SULTAN', description:'Collect 20 Indori Sikke.', target:20, unit:'coins', seconds:85, rewardCoins:90, difficulty:4, minDist:2200, rewardJeeravan:1 },
+      { id:'dodges_18_hard', action:'dodges', title:'CHAMPION DRIVER', description:'Cleanly dodge 18 obstacles.', target:18, unit:'dodges', seconds:95, rewardCoins:100, difficulty:4, minDist:2500, rewardJeeravan:1 },
+      { id:'jumps_14_hard', action:'jumps', title:'AASMAAN KA BADSHAH', description:'Perform 14 jumps.', target:14, unit:'jumps', seconds:90, rewardCoins:90, difficulty:4, minDist:2500, rewardJeeravan:1 },
+      { id:'slides_14_hard', action:'slides', title:'SLIDE LEGEND', description:'Perform 14 slides.', target:14, unit:'slides', seconds:90, rewardCoins:90, difficulty:4, minDist:2500, rewardJeeravan:1 },
+      { id:'distance_2200_legend', action:'distance', title:'LEGEND OF INDORE', description:'Cover 2,200 metres before time runs out.', target:2200, unit:'m', seconds:125, rewardCoins:100, difficulty:5, minDist:4000, rewardJeeravan:2 }
+    ];
+    let missionStreak = 0;
+    try { missionStreak = Math.max(0, Math.floor(Number(localStorage.getItem(MISSION_STREAK_KEY)) || 0)); } catch (_) {}
+    let activeMission = null;
+    let missionProgress = 0;
+    let missionComplete = false;
+    let missionResolved = false;
+    let missionTimeLeft = 0;
+    let missionStartDistance = 0;
+    let missionCooldown = 0;
+    let missionCompleteDisplay = 0;
+    let missionReward = 0;
+    let missionJeeravanReward = 0;
+    let missionCompletedCount = 0;
+    let missionLastUiProgress = -1;
+    let missionLastAnalyticsProgress = 0;
+    let missionRecentIds = [];
+    let missionResultSummary = [];
+
+    function renderMissionHud(force = false) {
+      const card = document.getElementById('mission-card');
+      if (!card || !activeMission) return;
+      if (!force && missionLastUiProgress === missionProgress) return;
+      missionLastUiProgress = missionProgress;
+      card.classList.remove('hidden');
+      const title = document.getElementById('mission-title');
+      const description = document.getElementById('mission-description');
+      const status = document.getElementById('mission-status');
+      const count = document.getElementById('mission-count');
+      const fill = document.getElementById('mission-progress-fill');
+      const streak = document.getElementById('mission-streak-mini');
+      const timer = document.getElementById('mission-time');
+      const rewardLine = document.getElementById('mission-reward-line');
+      if (title) title.textContent = missionComplete ? 'MISSION COMPLETE!' : (missionResolved ? 'TIME IS UP!' : activeMission.title);
+      if (description) description.textContent = missionComplete ? 'Bhiya, challenge fatah kar liya!' : (missionResolved ? 'No worries, a fresh mission is coming soon.' : activeMission.description);
+      if (status) status.textContent = missionComplete ? 'COMPLETED' : (missionResolved ? 'NOT COMPLETED' : 'Progress');
+      if (count) count.textContent = `${missionProgress.toLocaleString()} / ${activeMission.target.toLocaleString()}`;
+      if (fill) fill.style.width = `${Math.min(100, missionProgress / activeMission.target * 100)}%`;
+      if (streak) streak.textContent = `🔥 STREAK ${missionStreak}`;
+      if (timer) timer.textContent = missionResolved ? (missionComplete ? 'DONE!' : 'TIME UP') : `${Math.max(0, Math.ceil(missionTimeLeft))}s`;
+      if (rewardLine) rewardLine.textContent = `REWARD · ${activeMission.rewardCoins} SIKKE${activeMission.rewardJeeravan ? ` + ${activeMission.rewardJeeravan} JEERAVAN` : ''}`;
+    }
+
+    function chooseNextMission() {
+      const eligible = MISSION_DEFS.filter(m => game.distance >= (m.minDist || 0) &&
+        !missionRecentIds.includes(m.id));
+      let pool = eligible.length ? eligible : MISSION_DEFS.filter(m => game.distance >= (m.minDist || 0));
+      if (!pool.length) pool = MISSION_DEFS.filter(m => m.difficulty <= 2);
+      // Keep challenge fair: avoid the hardest missions until the player has travelled far enough.
+      const maxDifficulty = game.distance < 900 ? 2 : game.distance < 2200 ? 3 : game.distance < 4200 ? 4 : 5;
+      const fairPool = pool.filter(m => m.difficulty <= maxDifficulty);
+      if (fairPool.length) pool = fairPool;
+      const weighted = pool.map(m => ({ mission:m, weight:m.difficulty >= 4 ? 0.55 : m.difficulty === 3 ? 0.8 : 1.4 }));
+      const total = weighted.reduce((s, x) => s + x.weight, 0);
+      let roll = Math.random() * total;
+      let chosen = weighted[weighted.length - 1].mission;
+      for (const item of weighted) { roll -= item.weight; if (roll <= 0) { chosen = item.mission; break; } }
+      missionRecentIds.push(chosen.id);
+      if (missionRecentIds.length > 4) missionRecentIds.shift();
+      return chosen;
+    }
+
+    function startNextMission() {
+      if (game.state !== 'PLAYING' || game.policeActive || game.state === 'CAPTURED') return;
+      activeMission = chooseNextMission();
+      missionProgress = 0;
+      missionComplete = false;
+      missionTimeLeft = activeMission.seconds;
+      missionResolved = false;
+      missionComplete = false;
+      missionStartDistance = Math.max(0, Number(game.distance) || 0);
+      missionLastUiProgress = -1;
+      missionLastAnalyticsProgress = 0;
+      renderMissionHud(true);
+      trackRajwadaEvent('mission_started', {
+        mission_id: activeMission.id,
+        mission_target: activeMission.target,
+        mission_time_limit_seconds: activeMission.seconds,
+        mission_difficulty: activeMission.difficulty,
+        mission_reward_coins: activeMission.rewardCoins,
+        mission_reward_jeeravan: activeMission.rewardJeeravan || 0
+      });
+    }
+
+    function finishActiveMission(completed) {
+      if (!activeMission || missionResolved) return;
+      missionResolved = true;
+      missionComplete = !!completed;
+      if (missionComplete) {
+        missionStreak += 1;
+        missionCompletedCount += 1;
+        missionReward += activeMission.rewardCoins;
+        const jeeravan = Math.max(0, Number(activeMission.rewardJeeravan) || 0);
+        if (jeeravan) {
+          missionJeeravanReward += jeeravan;
+          game.jeeravanRun += jeeravan;
+        }
+        missionResultSummary.push(`${activeMission.title}: +${activeMission.rewardCoins} Sikke${jeeravan ? `, +${jeeravan} Jeeravan` : ''}`);
+        trackRajwadaEvent('mission_completed', {
+          mission_id: activeMission.id,
+          mission_reward: activeMission.rewardCoins,
+          mission_reward_jeeravan: jeeravan,
+          mission_streak: missionStreak
+        });
+        try { addFloatingBadge(`MISSION COMPLETE · +${activeMission.rewardCoins} SIKKE${jeeravan ? ` · +${jeeravan} JEERAVAN` : ''}`, '#fbbf24'); } catch (_) {}
+        try { audio.playPohaBonus(); } catch (_) {}
+      } else {
+        missionStreak = 0;
+        try { addFloatingBadge('MISSION TIME UP · NEXT CHANCE SOON!', '#fca5a5'); } catch (_) {}
+        trackRajwadaEvent('mission_failed', {
+          mission_id: activeMission.id,
+          final_progress: missionProgress,
+          mission_target: activeMission.target
+        });
+      }
+      try { localStorage.setItem(MISSION_STREAK_KEY, String(missionStreak)); } catch (_) {}
+      trackRajwadaEvent('mission_run_result', {
+        mission_id: activeMission.id,
+        completed: missionComplete,
+        final_progress: missionProgress,
+        mission_target: activeMission.target,
+        mission_streak: missionStreak,
+        mission_reward: missionComplete ? activeMission.rewardCoins : 0
+      });
+      missionCompleteDisplay = MISSION_COMPLETE_DISPLAY_SECONDS;
+      missionCooldown = MISSION_COOLDOWN_SECONDS;
+      const card = document.getElementById('mission-card');
+      if (card) card.classList.remove('hidden');
+      renderMissionHud(true);
+    }
+
+    function updateMissionSystem(dt) {
+      if (game.state !== 'PLAYING' || game.policeActive) return;
+      if (missionCompleteDisplay > 0) {
+        missionCompleteDisplay = Math.max(0, missionCompleteDisplay - dt);
+        if (missionCompleteDisplay <= 0) {
+          const card = document.getElementById('mission-card');
+          if (card) card.classList.add('hidden');
+          activeMission = null;
+          missionLastUiProgress = -1;
+        }
+      }
+      if (missionCooldown > 0) {
+        missionCooldown = Math.max(0, missionCooldown - dt);
+        if (missionCooldown <= 0 && !activeMission && !game.policeActive) startNextMission();
+        return;
+      }
+      if (activeMission && !missionResolved) {
+        missionTimeLeft = Math.max(0, missionTimeLeft - dt);
+        const timer = document.getElementById('mission-time');
+        if (timer) timer.textContent = `${Math.ceil(missionTimeLeft)}s`;
+        if (missionTimeLeft <= 0) finishActiveMission(false);
+      }
+      if (!activeMission && missionCooldown <= 0 && !game.policeActive) startNextMission();
+    }
+
+    function updateMissionProgress(value) {
+      if (!activeMission || missionResolved) return;
+      const next = Math.max(missionProgress, Math.min(activeMission.target, Math.floor(Number(value) || 0)));
+      if (next === missionProgress) return;
+      missionProgress = next;
+      renderMissionHud(true);
+      const analyticsStep = activeMission.action === 'distance' ? 100 : 1;
+      if (missionProgress >= activeMission.target ||
+          missionProgress - missionLastAnalyticsProgress >= analyticsStep) {
+        trackRajwadaEvent('mission_progress', {
+          mission_id: activeMission.id,
+          progress: missionProgress,
+          target: activeMission.target,
+          time_left_seconds: Math.ceil(missionTimeLeft)
+        });
+        missionLastAnalyticsProgress = missionProgress;
+      }
+      if (missionProgress >= activeMission.target) finishActiveMission(true);
+    }
+
+    function incrementMission(action, amount = 1) {
+      if (activeMission && activeMission.action === action) updateMissionProgress(missionProgress + amount);
+    }
+
+    function beginRunMission() {
+      activeMission = null;
+      missionProgress = 0;
+      missionComplete = false;
+      missionResolved = false;
+      missionTimeLeft = 0;
+      missionCooldown = 0;
+      missionCompleteDisplay = 0;
+      missionReward = 0;
+      missionJeeravanReward = 0;
+      missionCompletedCount = 0;
+      missionRecentIds = [];
+      missionResultSummary = [];
+      missionStreak = Math.max(0, missionStreak);
+      missionLastUiProgress = -1;
+      missionLastAnalyticsProgress = 0;
+      const card = document.getElementById('mission-card');
+      if (card) card.classList.add('hidden');
+      // The first mission starts immediately; subsequent missions respect the 30-second cooldown.
+      startNextMission();
+    }
+
+    function finalizeRunMission() {
+      if (activeMission && !missionResolved) {
+        // An unfinished mission at game-over is simply recorded as missed.
+        missionStreak = 0;
+      }
+      try { localStorage.setItem(MISSION_STREAK_KEY, String(missionStreak)); } catch (_) {}
+      trackRajwadaEvent('mission_run_result_total', {
+        completed_missions: missionCompletedCount,
+        mission_reward_coins: missionReward,
+        mission_reward_jeeravan: missionJeeravanReward,
+        mission_streak: missionStreak
+      });
+      const result = document.getElementById('go-mission-result-text');
+      const reward = document.getElementById('go-mission-reward');
+      if (result) result.textContent = missionCompletedCount
+        ? `${missionCompletedCount} MISSION${missionCompletedCount === 1 ? '' : 'S'} COMPLETED · STREAK ${missionStreak}`
+        : 'No missions completed this run. Try again, Bhiya!';
+      if (reward) reward.textContent = missionReward || missionJeeravanReward
+        ? `+${missionReward} BONUS INDOORI SIKKE${missionJeeravanReward ? ` · +${missionJeeravanReward} JEERAVAN EARNED THIS RUN` : ''}`
+        : 'No mission rewards this run. Your next chance is waiting!';
+      const streakMenu = document.getElementById('menu-mission-streak');
+      if (streakMenu) streakMenu.textContent = missionStreak.toLocaleString();
+      const card = document.getElementById('mission-card');
+      if (card) card.classList.add('hidden');
+    }
+
     function createPoliceOfficerMesh() {
       const officer = new THREE.Group();
       const khaki = new THREE.MeshStandardMaterial({ color:0x9a8656, roughness:.86 });
@@ -3602,6 +3909,8 @@
     function renderMenuCharacters() {
       document.getElementById('menu-best').textContent = bestScore.toLocaleString();
       document.getElementById('menu-total-coins').textContent = totalCoinsBank.toLocaleString();
+      const missionStreakEl = document.getElementById('menu-mission-streak');
+      if (missionStreakEl) missionStreakEl.textContent = missionStreak.toLocaleString();
 
       const gridEl = document.getElementById('char-grid');
       gridEl.innerHTML = '';
@@ -3683,6 +3992,7 @@
       if (game.state !== 'PLAYING') return;
       flashPadButton('pad-jump');
       if (!player.isJumping) {
+        incrementMission('jumps');
         player.isJumping = true;
         player.isSliding = false;
         player.slideTimer = 0;
@@ -3703,6 +4013,7 @@
         player.bufferedAction = 'slide';
         player.bufferTimer = 0.24;
       }
+      incrementMission('slides');
       player.isSliding = true;
       player.slideTimer = 0.68;
       audio.playMove(205);
@@ -4398,6 +4709,7 @@
         });
         game.score = 0;
         game.distance = 0;
+        beginRunMission();
         game.jeeravanRun = 0;
         game.coinsRun = 0;
         game.mult = Math.min(3, ch.startMult);
@@ -4543,6 +4855,8 @@
 
       document.getElementById('chai-turbo-banner').classList.add('hidden');
       document.getElementById('hud').classList.add('hidden');
+      const missionCard = document.getElementById('mission-card');
+      if (missionCard) missionCard.classList.add('hidden');
       document.getElementById('pause-overlay').classList.add('hidden');
       document.getElementById('gameover-overlay').classList.add('hidden');
       document.getElementById('menu-overlay').classList.remove('hidden');
@@ -4573,6 +4887,7 @@
       const finalJeeravan = Math.max(0, Math.floor(Number(game.jeeravanRun) || 0));
       const finalCoins = Math.max(0, Math.floor(Number(game.coinsRun) || 0));
       const finalCombo = Math.max(1, Math.floor(Number(game.maxCombo) || 1));
+      finalizeRunMission();
       trackRajwadaEvent('game_over', {
         score: finalScore,
         distance_m: finalDist,
@@ -4621,7 +4936,7 @@
           bestScore = finalScore;
           try { localStorage.setItem(BEST_KEY, String(bestScore)); } catch (_) {}
         }
-        totalCoinsBank += finalCoins;
+        totalCoinsBank += finalCoins + missionReward;
         try { localStorage.setItem(COIN_BANK_KEY, String(totalCoinsBank)); } catch (_) {}
 
         const ch = getSelectedChar();
@@ -4867,6 +5182,7 @@
       }
 
       const ch = getSelectedChar();
+      updateMissionSystem(dt);
 
       if (game.shakeTime > 0) {
         game.shakeTime = Math.max(0, game.shakeTime - dt);
@@ -4877,6 +5193,9 @@
       game.speed = effectiveSpeed;
 
       game.distance += effectiveSpeed * 1.15 * dt;
+      if (activeMission && activeMission.action === 'distance') {
+        updateMissionProgress(game.distance - missionStartDistance);
+      }
 
       while (game.distance >= rajwadaNextDistanceMilestone) {
 
@@ -5054,6 +5373,7 @@
               spawnParticles3D(item.lane * LANE_WIDTH, 1.0, item.z, 0xef4444, 7);
              addFloatingBadge('JEERAVAN +1', '#fca5a5'); } else if (item.type === 'coin') {
               game.coinsRun++;
+              incrementMission('coins');
               audio.playCoin();
               spawnParticles3D(item.lane * LANE_WIDTH, .95, item.z, 0xfbbf24, 5);
             } else if (item.type === 'poha') {
@@ -5115,6 +5435,7 @@
           obs.nearMissAwarded = true;
           if (!obs.collisionHandled && !obs.smashed) {
             trackObstacleOutcome(obs, 'dodged');
+            incrementMission('dodges');
           }
           const distLane = Math.abs(obs.lane - player.visualX);
           if (obs.type === 'bhandara' && distLane < 0.42 && player.y >= 1.15) {
