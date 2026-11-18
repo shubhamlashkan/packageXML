@@ -3535,6 +3535,7 @@
       policeNextAt: 0,
       policeChaiTriggered: false, policeChaiSpawned: false,
       policeElapsed: 0,
+      policeFadeRemaining: 0,
       policeChallengeTotal: 14,
       policeChallengesSpawned: 0,
       policeChallengesResolved: 0,
@@ -4384,9 +4385,60 @@
       if (banner) banner.classList.add('hidden');
     }
 
+    function setPoliceOfficerOpacity(opacity) {
+      if (!policeChaser.mesh) return;
+      policeChaser.mesh.traverse(obj => {
+        if (!obj.isMesh || !obj.material) return;
+        const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
+        materials.forEach(mat => {
+          mat.transparent = opacity < 1;
+          mat.opacity = opacity;
+          mat.depthWrite = opacity >= 0.98;
+          mat.needsUpdate = true;
+        });
+      });
+    }
+
+    function clearPoliceChallengeHazards() {
+      for (let i = obstacles.length - 1; i >= 0; i--) {
+        if (obstacles[i].policeChallenge) {
+          scene.remove(obstacles[i].mesh);
+          obstacles.splice(i, 1);
+        }
+      }
+    }
+
+    function finishPoliceEscape(reason = 'clean_escape') {
+      if (!game.policeActive || game.state !== 'PLAYING') return;
+      trackRajwadaEvent('police_chase_escape', {
+        distance_m: Math.floor(Number(game.distance) || 0),
+        escape_score: Math.round(game.policeEscapeScore),
+        hazards_cleared: game.policeChallengesResolved,
+        hazards_total: game.policeChallengeTotal,
+        escape_reason: reason
+      });
+      game.policeActive = false;
+      game.policeTimer = 0;
+      game.policeChallengeSpawnClock = 999;
+      clearPoliceChallengeHazards();
+      hidePoliceChaseHud();
+      game.score += 10 * game.mult;
+      // Let the officer visibly fall back and fade away instead of popping out.
+      game.policeFadeRemaining = 1.35;
+      policeChaser.mesh.visible = true;
+      setPoliceOfficerOpacity(1);
+      game.policeNextAt = game.distance + 2600 + Math.random() * 1000;
+      game.policeChaiTriggered = false;
+      game.policeChaiSpawned = false;
+      addFloatingBadge(`INSPECTOR KO CHAKMA DIYA! ${Math.round(game.policeEscapeScore)}/100`, '#86efac');
+      audio.playPowerup();
+    }
+
     function startPoliceChase() {
       if (game.state !== 'PLAYING' || game.policeActive) return;
       game.policeActive = true;
+      game.policeFadeRemaining = 0;
+      setPoliceOfficerOpacity(1);
       game.policeTimer = 28; // 5-second siren warning + 23-second escape challenge
       game.policeGap = 65;
       game.policeElapsed = 0;
@@ -4476,6 +4528,15 @@
 
     function updatePoliceChase(dt) {
       if (!game.policeActive) {
+        if (game.policeFadeRemaining > 0) {
+          game.policeFadeRemaining = Math.max(0, game.policeFadeRemaining - dt);
+          const fadeProgress = 1 - game.policeFadeRemaining / 1.35;
+          setPoliceOfficerOpacity(Math.max(0, 1 - fadeProgress));
+          if (game.policeFadeRemaining <= 0) {
+            policeChaser.mesh.visible = false;
+            setPoliceOfficerOpacity(1);
+          }
+        }
         const distanceRate = Math.max(1, game.speed * 1.15);
         const secondsUntilPolice = (game.policeNextAt - game.distance) / distanceRate;
         if (!game.policeChaiSpawned && secondsUntilPolice <= 15) {
@@ -4553,24 +4614,18 @@
         ? `FINAL HAZARDS · ESCAPE SCORE ${Math.round(game.policeEscapeScore)}/100 · ${game.policeChallengesResolved}/${game.policeChallengeTotal} CLEARED`
         : `ESCAPE SCORE ${Math.round(game.policeEscapeScore)}/100 · NEED 60 TO ESCAPE · ${game.policeChallengesResolved}/${game.policeChallengeTotal} CLEARED`;
 
+      // Reward a genuinely clean run early: once at least 8 hazards are cleared
+      // and the escape score reaches 85, end the chase instead of forcing all 14.
+      if (game.policeChallengesResolved >= 8 && game.policeEscapeScore >= 85) {
+        finishPoliceEscape('clean_early_escape');
+        return;
+      }
+
       if (game.policeTimer <= 0 &&
           game.policeChallengesSpawned >= game.policeChallengeTotal &&
           game.policeChallengesResolved >= game.policeChallengeTotal) {
         if (game.policeEscapeScore >= 60) {
-          trackRajwadaEvent('police_chase_escape', {
-            distance_m: Math.floor(Number(game.distance) || 0),
-            escape_score: Math.round(game.policeEscapeScore),
-            hazards_cleared: game.policeChallengesResolved
-          });
-          game.policeActive = false;
-          policeChaser.mesh.visible = false;
-          hidePoliceChaseHud();
-          game.score += 10 * game.mult;
-          game.policeNextAt = game.distance + 2600 + Math.random() * 1000;
-          game.policeChaiTriggered = false;
-          game.policeChaiSpawned = false;
-          addFloatingBadge(`INSPECTOR KO CHAKMA DIYA! ${game.policeEscapeScore}/100`, '#86efac');
-          audio.playPowerup();
+          finishPoliceEscape('all_hazards_cleared');
         } else {
           triggerPoliceCapture(`Escape score ${game.policeEscapeScore}/100 raha. Inspector ne pakad liya bhiya!`);
         }
@@ -4583,12 +4638,7 @@
       policeChaser.mesh.visible = false;
       hidePoliceChaseHud();
       // Remove any remaining police challenge obstacles before a Jeeravan revive/game over.
-      for (let i = obstacles.length - 1; i >= 0; i--) {
-        if (obstacles[i].policeChallenge) {
-          scene.remove(obstacles[i].mesh);
-          obstacles.splice(i, 1);
-        }
-      }
+      clearPoliceChallengeHazards();
 
       // No popup if the player cannot afford the escape, or has already revived.
       if (game.policeRevivesUsed || game.jeeravanRun < 10) {
@@ -4668,7 +4718,9 @@
       });
       game.policeRevivesUsed = true;
       game.policeActive = false;
+      game.policeFadeRemaining = 0;
       policeChaser.mesh.visible = false;
+      setPoliceOfficerOpacity(1);
       const overlay = document.getElementById('police-overlay');
       if (overlay) overlay.classList.add('hidden');
       game.state = 'PLAYING';
@@ -4728,6 +4780,8 @@
         game.policeTimer = 0;
         game.policeGap = 100;
         game.policeElapsed = 0;
+        game.policeFadeRemaining = 0;
+        setPoliceOfficerOpacity(1);
         game.policeChallengeTotal = 14;
         game.policeChallengesSpawned = 0;
         game.policeChallengesResolved = 0;
