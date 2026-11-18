@@ -4790,7 +4790,7 @@
       }
 
       const targetBase = Math.min(game.maxSpeed, game.baseSpeed + game.distance * 0.0085);
-      const effectiveSpeed = player.chaiTimer > 0 ? targetBase * 1.46 : targetBase;
+      const effectiveSpeed = player.chaiTimer > 0 ? targetBase * 1.20 : targetBase;
       game.speed = effectiveSpeed;
 
       game.distance += effectiveSpeed * 1.15 * dt;
