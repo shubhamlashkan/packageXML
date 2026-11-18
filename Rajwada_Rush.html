@@ -1152,15 +1152,33 @@
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
     gtag('config', 'G-HG116EGWKN');
-    // Rajwada Rush gameplay analytics. This only sends GA4 events; it does not alter game state.
+    // Rajwada Rush gameplay analytics. Analytics failures must never affect gameplay.
+    let rajwadaRunId = '';
+    let rajwadaRunStartedAt = 0;
+    let rajwadaRunPausedMs = 0;
+    let rajwadaPauseStartedAt = 0;
+    let rajwadaNextDistanceMilestone = 500;
     function trackRajwadaEvent(eventName, eventParams) {
       try {
         if (typeof window.gtag === 'function') {
-          window.gtag('event', eventName, eventParams || {});
+          window.gtag('event', eventName, Object.assign({
+            run_id: rajwadaRunId || 'no_run',
+            game_version: 'ga4_gameplay_v2'
+          }, eventParams || {}));
         }
       } catch (analyticsError) {
         // Analytics must never interrupt gameplay.
       }
+    }
+    function trackObstacleOutcome(obs, outcome, extra) {
+      try {
+        trackRajwadaEvent('obstacle_result', Object.assign({
+          obstacle_type: String(obs && obs.type || 'unknown'),
+          outcome: outcome,
+          distance_m: Math.floor(Number(game.distance) || 0),
+          police_chase: !!(obs && obs.policeChallenge || game.policeActive)
+        }, extra || {}));
+      } catch (_) {}
     }
 
   </script>
@@ -1596,15 +1614,32 @@
       function startBgm(turbo = false) {
         init();
         if (!ctx) return;
-        if (bgmTimer && isTurboTempo === turbo) return;
-        stopBgm();
-        isTurboTempo = turbo;
-        const intervalMs = turbo ? 108 : 140;
-        bgmTimer = setInterval(() => {
-          if (!ctx || isMuted || ctx.state !== 'running') return;
-          scheduleStep(beatStep, ctx.currentTime);
+
+        const beginPlayback = () => {
+          if (!ctx || isMuted) return;
+          if (bgmTimer && isTurboTempo === turbo) return;
+          stopBgm();
+          isTurboTempo = turbo;
+          const intervalMs = turbo ? 108 : 140;
+
+          // Start with an audible beat immediately rather than waiting for the first timer tick.
+          scheduleStep(beatStep, ctx.currentTime + 0.02);
           beatStep = (beatStep + 1) % 16;
-        }, intervalMs);
+
+          bgmTimer = setInterval(() => {
+            if (!ctx || isMuted || ctx.state !== 'running') return;
+            scheduleStep(beatStep, ctx.currentTime + 0.02);
+            beatStep = (beatStep + 1) % 16;
+          }, intervalMs);
+        };
+
+        if (ctx.state === 'suspended') {
+          ctx.resume().then(beginPlayback).catch((err) => {
+            console.warn('Background music could not resume:', err);
+          });
+        } else {
+          beginPlayback();
+        }
       }
 
       function stopBgm() {
@@ -4098,6 +4133,11 @@
       if (item.prePoliceChai) game.policeChaiTriggered = true;
       const ch = getSelectedChar();
       player.chaiTimer = player.chaiMax * (ch.chaiDurMult || 1);
+      trackRajwadaEvent('powerup_activated', {
+        powerup_type: 'chai_turbo',
+        duration_seconds: Number(player.chaiTimer.toFixed(1)),
+        distance_m: Math.floor(Number(game.distance) || 0)
+      });
       audio.playChai();
       audio.startBgm(true);
       spawnParticles3D((item ? item.lane : player.visualX) * LANE_WIDTH, 1.1, item ? item.z : 0, 0xff9f1c, 18);
@@ -4241,6 +4281,11 @@
 
       // No popup if the player cannot afford the escape, or has already revived.
       if (game.policeRevivesUsed || game.jeeravanRun < 10) {
+        trackRajwadaEvent('police_revive_decision', {
+          decision: game.policeRevivesUsed ? 'unavailable_already_used' : 'unavailable_insufficient_jeeravan',
+          jeeravan_available: Math.floor(Number(game.jeeravanRun) || 0),
+          distance_m: Math.floor(Number(game.distance) || 0)
+        });
         triggerGameOver(reasonMsg || 'Police ne pakad liya bhiya!');
         return;
       }
@@ -4276,6 +4321,11 @@
         const remainingMs = Math.max(0, policeDecisionDeadline - Date.now());
         if (countdown) countdown.textContent = `${Math.ceil(remainingMs / 1000)}`;
         if (remainingMs <= 0) {
+          trackRajwadaEvent('police_revive_decision', {
+            decision: 'timed_out',
+            jeeravan_available: Math.floor(Number(game.jeeravanRun) || 0),
+            distance_m: Math.floor(Number(game.distance) || 0)
+          });
           clearPoliceDecisionTimer();
           const captureOverlay = document.getElementById('police-overlay');
           if (captureOverlay) captureOverlay.classList.add('hidden');
@@ -4295,6 +4345,11 @@
       }
 
       clearPoliceDecisionTimer();
+      trackRajwadaEvent('police_revive_decision', {
+        decision: 'accepted',
+        jeeravan_spent: 10,
+        distance_m: Math.floor(Number(game.distance) || 0)
+      });
       game.jeeravanRun -= 10;
       trackRajwadaEvent('police_revive', {
         jeeravan_spent: 10,
@@ -4331,6 +4386,13 @@
         clearDynamic3DEntities();
 
         game.state = 'PLAYING';
+        rajwadaRunId = (window.crypto && typeof window.crypto.randomUUID === 'function')
+          ? window.crypto.randomUUID()
+          : ('rr_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10));
+        rajwadaRunStartedAt = Date.now();
+        rajwadaRunPausedMs = 0;
+        rajwadaPauseStartedAt = 0;
+        rajwadaNextDistanceMilestone = 500;
         trackRajwadaEvent('game_start', {
           character: ch.shortName || ch.id || 'unknown'
         });
@@ -4421,6 +4483,11 @@
     function pauseGame() {
       if (game.state !== 'PLAYING') return;
       game.state = 'PAUSED';
+      rajwadaPauseStartedAt = Date.now();
+      trackRajwadaEvent('game_pause', {
+        distance_m: Math.floor(Number(game.distance) || 0),
+        score: Math.floor(Number(game.score) || 0)
+      });
       audio.stopBgm();
       document.getElementById('pause-overlay').classList.remove('hidden');
     }
@@ -4428,6 +4495,15 @@
     function resumeGame() {
       if (game.state !== 'PAUSED') return;
       game.state = 'PLAYING';
+      if (rajwadaPauseStartedAt) {
+        const pauseMs = Math.max(0, Date.now() - rajwadaPauseStartedAt);
+        rajwadaRunPausedMs += pauseMs;
+        trackRajwadaEvent('game_resume', {
+          pause_duration_seconds: Math.round(pauseMs / 1000),
+          distance_m: Math.floor(Number(game.distance) || 0)
+        });
+        rajwadaPauseStartedAt = 0;
+      }
       game.lastFrameTime = performance.now();
       audio.startBgm(player.chaiTimer > 0);
       document.getElementById('pause-overlay').classList.add('hidden');
@@ -4503,6 +4579,8 @@
         jeeravan_collected: finalJeeravan,
         coins_collected: finalCoins,
         max_combo: finalCombo,
+        run_duration_seconds: rajwadaRunStartedAt ? Math.max(0, Math.round((Date.now() - rajwadaRunStartedAt - rajwadaRunPausedMs) / 1000)) : 0,
+        wall_duration_seconds: rajwadaRunStartedAt ? Math.max(0, Math.round((Date.now() - rajwadaRunStartedAt) / 1000)) : 0,
         reason: String(reasonMsg || 'unknown').slice(0, 100)
       });
 
@@ -4600,6 +4678,11 @@
       if (game.state !== 'PLAYING' || player.shieldCharges <= 0 || player.shieldTimer > 0) return;
       player.shieldCharges--;
       player.shieldTimer = player.shieldMax;
+      trackRajwadaEvent('powerup_activated', {
+        powerup_type: 'bhandara_shield',
+        duration_seconds: Number(player.shieldTimer.toFixed(1)),
+        distance_m: Math.floor(Number(game.distance) || 0)
+      });
       audio.playPowerup();
       spawnParticles3D(player.visualX * LANE_WIDTH, 1.2, 0, 0x38bdf8, 16);
       addFloatingBadge('ALL-OBSTACLE SHIELD ACTIVE · 10s', '#38bdf8');
@@ -4794,6 +4877,20 @@
       game.speed = effectiveSpeed;
 
       game.distance += effectiveSpeed * 1.15 * dt;
+
+      while (game.distance >= rajwadaNextDistanceMilestone) {
+
+        trackRajwadaEvent('distance_milestone', {
+
+          milestone_m: rajwadaNextDistanceMilestone,
+
+          score: Math.floor(Number(game.score) || 0)
+
+        });
+
+        rajwadaNextDistanceMilestone += 500;
+
+      }
       updatePoliceChase(dt);
       if (game.state !== 'PLAYING') return;
       // Slow distance score: skill pickups and clean play matter more than simply surviving.
@@ -4834,12 +4931,32 @@
       // Power-Up Timers
       if (player.chaiTimer > 0) {
         player.chaiTimer = Math.max(0, player.chaiTimer - dt);
-        if (player.chaiTimer === 0) audio.startBgm(false);
+        if (player.chaiTimer === 0) {
+          trackRajwadaEvent('powerup_expired', {
+            powerup_type: 'chai_turbo',
+            distance_m: Math.floor(Number(game.distance) || 0)
+          });
+          audio.startBgm(false);
+        }
       }
       if (player.sevTimer > 0) {
         player.sevTimer = Math.max(0, player.sevTimer - dt);
+        if (player.sevTimer === 0) {
+          trackRajwadaEvent('powerup_expired', {
+            powerup_type: 'sev_magnet',
+            distance_m: Math.floor(Number(game.distance) || 0)
+          });
+        }
       }
-      if (player.shieldTimer > 0) player.shieldTimer = Math.max(0, player.shieldTimer - dt);
+      if (player.shieldTimer > 0) {
+        player.shieldTimer = Math.max(0, player.shieldTimer - dt);
+        if (player.shieldTimer === 0) {
+          trackRajwadaEvent('powerup_expired', {
+            powerup_type: 'bhandara_shield',
+            distance_m: Math.floor(Number(game.distance) || 0)
+          });
+        }
+      }
 
       // Smooth Lane Interpolation & Stride
       player.visualX += (player.lane - player.visualX) * Math.min(1, dt * 16);
@@ -4952,6 +5069,11 @@
               activateChaiTurbo(item);
             } else if (item.type === 'sev') {
               player.sevTimer = player.sevMax;
+              trackRajwadaEvent('powerup_activated', {
+                powerup_type: 'sev_magnet',
+                duration_seconds: Number(player.sevTimer.toFixed(1)),
+                distance_m: Math.floor(Number(game.distance) || 0)
+              });
               audio.playSev();
               // A few seconds later, reward the magnet with a short all-lane coin sweep.
               game.magnetCoinWaveAt = game.distance + 85;
@@ -4991,6 +5113,9 @@
         // Close-Call or Clean Jump Over Bhandara Bonus
         if (!obs.nearMissAwarded && obs.z > 1.4) {
           obs.nearMissAwarded = true;
+          if (!obs.collisionHandled && !obs.smashed) {
+            trackObstacleOutcome(obs, 'dodged');
+          }
           const distLane = Math.abs(obs.lane - player.visualX);
           if (obs.type === 'bhandara' && distLane < 0.42 && player.y >= 1.15) {
             const bPts = 8 * game.mult;
@@ -5023,6 +5148,13 @@
             game.shakeIntensity = 0.22;
             game.hitStop = 0.04;
             audio.playSmash();
+            trackRajwadaEvent('powerup_effect', {
+              powerup_type: 'bhandara_shield',
+              effect: 'obstacle_blocked',
+              obstacle_type: String(obs.type || 'unknown'),
+              distance_m: Math.floor(Number(game.distance) || 0)
+            });
+            trackObstacleOutcome(obs, 'blocked_by_shield');
             spawnParticles3D(player.visualX * LANE_WIDTH, 1.1, obs.z, 0x38bdf8, 16);
             addFloatingBadge('SHIELD BLOCKED OBSTACLE!', '#38bdf8');
             continue;
@@ -5034,6 +5166,13 @@
             obs.smashVx = (obs.lane >= player.visualX ? 1 : -1) * 4.5;
             const smashPts = 6 * game.mult;
             game.score += smashPts;
+            trackRajwadaEvent('powerup_effect', {
+              powerup_type: 'chai_turbo',
+              effect: 'obstacle_smashed',
+              obstacle_type: String(obs.type || 'unknown'),
+              distance_m: Math.floor(Number(game.distance) || 0)
+            });
+            trackObstacleOutcome(obs, 'smashed_by_chai');
             game.shakeTime = 0.16;
             game.shakeIntensity = 0.28;
             audio.playSmash();
@@ -5051,6 +5190,7 @@
             const safelyAirborne = player.isJumping && player.y > 0.42;
             if (!safelyAirborne) {
               game.score = Math.max(0, game.score - 12);
+              trackObstacleOutcome(obs, 'hit', { collision_kind: 'pothole_bump' });
               game.shakeTime = 0.24;
               game.shakeIntensity = 0.24;
               game.hitStop = 0.045;
@@ -5103,6 +5243,7 @@
           }
 
           if (collided) {
+            trackObstacleOutcome(obs, 'hit', { collision_kind: 'collision' });
             // During the police escape challenge, mistakes reduce the escape score;
             // the final score, rather than one unlucky collision, decides capture.
             // A vehicle collision is a normal crash, not a police capture.
