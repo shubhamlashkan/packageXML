@@ -310,6 +310,15 @@
     #mission-streak-mini { color:#fde68a; white-space:nowrap; }
     #mission-time { color:#fde68a; font-weight:900; white-space:nowrap; }
     #mission-reward-line { margin-top:5px; color:#86efac; font:800 .64rem 'Outfit',sans-serif; }
+
+    /* Surprise Road Events: lightweight overlays; no gameplay controls are intercepted. */
+    #road-event-visuals {
+      position:absolute; inset:0; z-index:12; overflow:hidden; pointer-events:none;
+    }
+@keyframes paper-drift {
+      0% { transform:translate3d(0,-10vh,0) rotate(0deg); }
+      100% { transform:translate3d(var(--drift-x,70px),115vh,0) rotate(520deg); }
+    }
     .mission-result-panel {
       margin:12px 0 14px; padding:12px 14px; border-radius:16px;
       border:1px solid rgba(255,209,102,.42); background:rgba(255,159,28,.10);
@@ -1301,7 +1310,7 @@
           <div id="toast-zone-title" class="toast-title">VIJAY NAGAR BRTS</div>
         </div>
       </div>
-
+      <div id="road-event-visuals" class="hidden" aria-hidden="true"></div>
       <!-- Prominent Chai Turbo (Smash Mode) Countdown Timer Banner -->
       <div id="chai-turbo-banner" class="hidden">
         <div class="turbo-banner-top">
@@ -3084,43 +3093,50 @@
           group.add(devotee);
         });
       } else if (type === 'ibus') {
-        // Indore Green & White BRTS iBus
-        const body = new THREE.Mesh(
-          new THREE.BoxGeometry(2.15, 2.35, 4.2),
-          new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.35 })
-        );
-        body.position.y = 1.25;
-        body.castShadow = true;
-        group.add(body);
+        // Indore BRTS iBus: tall white city bus, green lower band, broad windows and wheels.
+        const white = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.38 });
+        const green = new THREE.MeshStandardMaterial({ color: 0x059669, roughness: 0.42 });
+        const glassMat = new THREE.MeshStandardMaterial({ color: 0x123047, roughness: 0.18, metalness: 0.25 });
+        const rubber = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.95 });
+        const body = new THREE.Mesh(new THREE.BoxGeometry(2.25, 2.55, 4.55), white);
+        body.position.y = 1.42; body.castShadow = true; group.add(body);
 
-        const greenStripe = new THREE.Mesh(
-          new THREE.BoxGeometry(2.2, 0.72, 4.24),
-          new THREE.MeshStandardMaterial({ color: 0x059669, roughness: 0.4 })
-        );
-        greenStripe.position.y = 0.78;
-        group.add(greenStripe);
+        const lowerBand = new THREE.Mesh(new THREE.BoxGeometry(2.28, 0.72, 4.58), green);
+        lowerBand.position.y = 0.78; group.add(lowerBand);
 
-        const windshield = new THREE.Mesh(
-          new THREE.BoxGeometry(1.9, 0.82, 0.1),
-          new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.15, metalness: 0.8 })
-        );
-        windshield.position.set(0, 1.65, 2.08);
-        group.add(windshield);
+        // Large front windscreen and clearly visible destination display.
+        const windshield = new THREE.Mesh(new THREE.BoxGeometry(1.92, 0.88, 0.08), glassMat);
+        windshield.position.set(0, 1.88, 2.29); group.add(windshield);
+        const destination = new THREE.Mesh(new THREE.BoxGeometry(1.15, 0.30, 0.09),
+          new THREE.MeshBasicMaterial({ color: 0x0f172a }));
+        destination.position.set(0, 2.48, 2.29); group.add(destination);
+        const destinationText = new THREE.Mesh(new THREE.PlaneGeometry(0.92, 0.19),
+          new THREE.MeshBasicMaterial({ map:createSignTexture('iBUS', 'INDORE BRTS', '#0f172a', '#fbbf24'), transparent:false }));
+        destinationText.position.set(0, 2.48, 2.345); group.add(destinationText);
 
-        const ledBoard = new THREE.Mesh(
-          new THREE.BoxGeometry(1.4, 0.24, 0.12),
-          new THREE.MeshBasicMaterial({ color: 0xff9f1c })
-        );
-        ledBoard.position.set(0, 2.22, 2.08);
-        group.add(ledBoard);
+        // Passenger windows down both long sides.
+        [-1.135, 1.135].forEach(x => {
+          for (const z of [-1.35, -0.15, 1.05]) {
+            const window = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.78, 0.88), glassMat);
+            window.position.set(x, 1.93, z); group.add(window);
+          }
+        });
 
-        [-0.75, 0.75].forEach((hx) => {
-          const lamp = new THREE.Mesh(
-            new THREE.BoxGeometry(0.34, 0.2, 0.1),
-            new THREE.MeshBasicMaterial({ color: 0xfef08a })
-          );
-          lamp.position.set(hx, 0.42, 2.08);
-          group.add(lamp);
+        // Headlamps, bumper and six wheels make the vehicle silhouette unmistakable.
+        [-0.72, 0.72].forEach(x => {
+          const lamp = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.20, 0.08),
+            new THREE.MeshBasicMaterial({ color:0xfff1a8 }));
+          lamp.position.set(x, 0.48, 2.32); group.add(lamp);
+        });
+        const bumper = new THREE.Mesh(new THREE.BoxGeometry(1.95, 0.16, 0.16),
+          new THREE.MeshStandardMaterial({ color:0x334155 }));
+        bumper.position.set(0, 0.25, 2.32); group.add(bumper);
+        [-0.92, 0.92].forEach(x => {
+          [-1.45, 0.0, 1.48].forEach(z => {
+            const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.38, 0.18, 16), rubber);
+            wheel.rotation.z = Math.PI / 2;
+            wheel.position.set(x, 0.40, z); wheel.castShadow = true; group.add(wheel);
+          });
         });
       } else if (type === 'policebarrier') {
         // Temporary police roadblock: a low red-white striped hurdle to jump.
@@ -3167,37 +3183,53 @@
         tape.position.set(0, 0.94, -0.02);
         group.add(tape);
       } else if (type === 'auto') {
-        // MP-09 Black & Yellow Indore Auto-Rickshaw
-        const base = new THREE.Mesh(
-          new THREE.BoxGeometry(1.75, 0.85, 2.2),
-          new THREE.MeshStandardMaterial({ color: 0xffd166, roughness: 0.4 })
-        );
-        base.position.y = 0.62;
-        base.castShadow = true;
-        group.add(base);
+        // Familiar Indore black-and-yellow three-wheeler: tapered front, open cabin,
+        // yellow roof, green/black lower body and three clearly visible wheels.
+        const yellow = new THREE.MeshStandardMaterial({ color:0xffc928, roughness:0.52 });
+        const darkGreen = new THREE.MeshStandardMaterial({ color:0x14532d, roughness:0.68 });
+        const black = new THREE.MeshStandardMaterial({ color:0x111827, roughness:0.92 });
+        const glass = new THREE.MeshStandardMaterial({ color:0x67c9e8, roughness:0.2, metalness:0.15 });
+        const metal = new THREE.MeshStandardMaterial({ color:0x64748b, metalness:0.55, roughness:0.45 });
 
-        const canopy = new THREE.Mesh(
-          new THREE.BoxGeometry(1.7, 0.82, 1.9),
-          new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.7 })
-        );
-        canopy.position.set(0, 1.42, -0.1);
-        canopy.castShadow = true;
-        group.add(canopy);
+        // Low front nose and passenger compartment.
+        const lowerBody = new THREE.Mesh(new THREE.BoxGeometry(1.62, 0.66, 1.95), darkGreen);
+        lowerBody.position.set(0, 0.58, 0.05); lowerBody.castShadow = true; group.add(lowerBody);
+        const yellowFront = new THREE.Mesh(new THREE.BoxGeometry(1.35, 0.48, 0.28), yellow);
+        yellowFront.position.set(0, 0.78, 1.02); group.add(yellowFront);
+        const rearCabin = new THREE.Mesh(new THREE.BoxGeometry(1.55, 0.72, 1.12), darkGreen);
+        rearCabin.position.set(0, 1.08, -0.43); group.add(rearCabin);
 
-        const glass = new THREE.Mesh(
-          new THREE.BoxGeometry(1.45, 0.52, 0.1),
-          new THREE.MeshBasicMaterial({ color: 0x38bdf8 })
-        );
-        glass.position.set(0, 1.32, 0.86);
-        group.add(glass);
+        // Open-sided passenger cabin with thin support pillars.
+        const roof = new THREE.Mesh(new THREE.BoxGeometry(1.72, 0.16, 1.92), yellow);
+        roof.position.set(0, 1.82, -0.18); roof.castShadow = true; group.add(roof);
+        [-0.73, 0.73].forEach(x => {
+          const rearPost = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.88, 0.10), black);
+          rearPost.position.set(x, 1.34, -0.88); group.add(rearPost);
+          const frontPost = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.86, 0.10), black);
+          frontPost.position.set(x, 1.34, 0.58); group.add(frontPost);
+        });
+        const frontScreen = new THREE.Mesh(new THREE.BoxGeometry(1.38, 0.72, 0.07), glass);
+        frontScreen.position.set(0, 1.35, 0.62); group.add(frontScreen);
+        const frontFrame = new THREE.Mesh(new THREE.BoxGeometry(1.55, 0.09, 0.10), black);
+        frontFrame.position.set(0, 1.75, 0.62); group.add(frontFrame);
 
-        const headlight = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.16, 0.16, 0.12, 16),
-          new THREE.MeshBasicMaterial({ color: 0xffffff })
-        );
-        headlight.rotation.x = Math.PI / 2;
-        headlight.position.set(0, 0.62, 1.12);
-        group.add(headlight);
+        // Round headlamps and front bumper.
+        [-0.53, 0.53].forEach(x => {
+          const lamp = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.09, 14),
+            new THREE.MeshBasicMaterial({ color:0xfff4bf }));
+          lamp.rotation.x = Math.PI/2; lamp.position.set(x, 0.69, 1.18); group.add(lamp);
+        });
+        const bumper = new THREE.Mesh(new THREE.BoxGeometry(1.48, 0.12, 0.14), metal);
+        bumper.position.set(0, 0.35, 1.12); group.add(bumper);
+
+        // One front wheel and two rear wheels (three-wheeler profile).
+        const wheelMat = black;
+        const frontWheel = new THREE.Mesh(new THREE.CylinderGeometry(0.31, 0.31, 0.22, 16), wheelMat);
+        frontWheel.rotation.z = Math.PI/2; frontWheel.position.set(0, 0.31, 0.91); group.add(frontWheel);
+        [-0.78, 0.78].forEach(x => {
+          const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.18, 16), wheelMat);
+          wheel.rotation.z = Math.PI/2; wheel.position.set(x, 0.34, -0.58); group.add(wheel);
+        });
       }
 
       return group;
@@ -3297,7 +3329,27 @@
     function createCollectibleMesh(type) {
       const group = new THREE.Group();
 
-      if (type === 'coin') {
+      if (type === 'vip') {
+        const gold = new THREE.MeshStandardMaterial({
+          color:0xfacc15, metalness:0.82, roughness:0.2,
+          emissive:0x92400e, emissiveIntensity:0.5
+        });
+        const dark = new THREE.MeshStandardMaterial({ color:0x78350f, metalness:0.45, roughness:0.3 });
+        const medallion = new THREE.Mesh(new THREE.CylinderGeometry(0.48,0.48,0.14,32),gold);
+        medallion.rotation.x = Math.PI / 2;
+        group.add(medallion);
+        const rim = new THREE.Mesh(new THREE.TorusGeometry(0.43,0.055,10,32),dark);
+        rim.position.z = 0.09;
+        group.add(rim);
+        const star = new THREE.Mesh(new THREE.OctahedronGeometry(0.22,1),gold);
+        star.position.z = 0.13;
+        star.rotation.z = Math.PI / 4;
+        group.add(star);
+        const ribbon = new THREE.Mesh(new THREE.BoxGeometry(0.48,0.13,0.045),
+          new THREE.MeshStandardMaterial({color:0x7c2d12,roughness:0.55}));
+        ribbon.position.set(0,-0.29,0.06);
+        group.add(ribbon);
+      } else if (type === 'coin') {
         const gold = new THREE.MeshStandardMaterial({color:0xfbbf24,metalness:.82,roughness:.22,emissive:0x854d0e,emissiveIntensity:.12});
         const edge = new THREE.MeshStandardMaterial({color:0xb45309,metalness:.78,roughness:.28});
         const body = new THREE.Mesh(new THREE.CylinderGeometry(.34,.34,.09,24),gold); body.rotation.x=Math.PI/2; group.add(body);
@@ -3518,6 +3570,7 @@
       sevNextSpawnDistance: 1100,
       jeeravanNextSpawnDistance: 750,
       specialNextSpawnDistance: 900,
+      vipNextSpawnDistance: 2600,
       magnetCoinWaveAt: 0,
       magnetCoinWavePending: false,
       shieldHintTimer: 0,
@@ -3577,27 +3630,292 @@
     let floatingBadges = [];
     let toastTimeout = null;
 
+    // A rare collectible activates a temporary VIP procession; no permanent unlock.
+    const vipMode = {
+      active:false, timer:0, duration:15, fadeDuration:3,
+      returnBlend:0, returnBlendDuration:1.8, petalSpawnTimer:0,
+      petals:[], banner:null, bannerFade:1
+    };
+
+    // Surprise Road Events: local-only, distance-triggered events with fair warning and cooldowns.
+    const ROAD_EVENT_DEFS = [
+      { id:'construction', title:'ROAD WORK AHEAD!', warning:'Construction ahead · find a clear lane', duration:13, subtitle:'DODGE THE WORK ZONE' },
+      { id:'monsoon', title:'WATERLOGGED GADDHAS!', warning:'Water-filled potholes ahead · watch your step', duration:14, subtitle:'DODGE THE WATER-FILLED POTHOLES' },
+      { id:'sikke', title:'SIKKE SHOWER!', warning:'Coins incoming · collect as many as you can', duration:15, subtitle:'COLLECT 6 FOR A BONUS' }
+    ];
+    const ROAD_EVENT_MIN_COOLDOWN = 45;
+    const ROAD_EVENT_MIN_DISTANCE = 700;
+    const ROAD_EVENT_MAX_DISTANCE = 1100;
+    const roadEventState = {
+      phase:'idle',
+      current:null,
+      timer:0,
+      cooldown:0,
+      nextAt:800,
+      lastId:null,
+      coinsCollected:0
+    };
+
+    function setRoadEventVisual(type) {
+      const layer = document.getElementById('road-event-visuals');
+      if (!layer) return;
+      layer.className = 'hidden';
+      layer.replaceChildren();
+    }
+
+    function hideRoadEventUi() {
+      const visuals = document.getElementById('road-event-visuals');
+      if (visuals) {
+        visuals.className = 'hidden';
+        visuals.replaceChildren();
+      }
+    }
+
+    function createRoadworkBarrierMesh() {
+      const group = new THREE.Group();
+      const orange = new THREE.MeshStandardMaterial({ color:0xf97316, roughness:.72 });
+      const white = new THREE.MeshStandardMaterial({ color:0xf8fafc, roughness:.62 });
+      const dark = new THREE.MeshStandardMaterial({ color:0x334155, roughness:.8 });
+      const board = new THREE.Mesh(new THREE.BoxGeometry(1.75,.58,.22), orange);
+      board.position.y = .72;
+      group.add(board);
+      for (let i = 0; i < 4; i++) {
+        const stripe = new THREE.Mesh(new THREE.BoxGeometry(.16,.6,.235), white);
+        stripe.position.set(-.65 + i*.43,.72,.015);
+        stripe.rotation.z = -.34;
+        group.add(stripe);
+      }
+      for (const x of [-.62,.62]) {
+        const leg = new THREE.Mesh(new THREE.BoxGeometry(.13,.55,.14), dark);
+        leg.position.set(x,.28,0);
+        group.add(leg);
+      }
+      const lampMat = new THREE.MeshStandardMaterial({ color:0xfde047, emissive:0xf59e0b, emissiveIntensity:.45 });
+      const lamp = new THREE.Mesh(new THREE.SphereGeometry(.11,10,8), lampMat);
+      lamp.position.set(0,1.12,.02);
+      group.add(lamp);
+      group.traverse(o => { if (o.isMesh) o.castShadow = true; });
+      return group;
+    }
+
+    function spawnRoadConstructionEvent() {
+      const lanes = [-1,0,1];
+      const occupied = new Set(obstacles.filter(o => !o.smashed && o.z > -150 && o.z < -65).map(o => o.lane));
+      const openLanes = lanes.filter(lane => !occupied.has(lane));
+      if (openLanes.length < 2) {
+        // Existing traffic already makes the road busy; don't add extra danger.
+          return;
+      }
+      const safeLane = openLanes[Math.floor(Math.random() * openLanes.length)];
+      const blocked = openLanes.filter(lane => lane !== safeLane);
+      blocked.forEach((lane, index) => {
+        const mesh = createRoadworkBarrierMesh();
+        const z = -128 - index * 3;
+        mesh.position.set(lane * LANE_WIDTH,0,z);
+        scene.add(mesh);
+        obstacles.push({
+          type:'pothole', lane, z, mesh,
+          nearMissAwarded:false, smashed:false, smashVx:0, smashVy:0,
+          roadEventObstacle:true
+        });
+      });
+    }
+
+    function spawnWaterloggedPotholes() {
+      // Three water-filled gaddhas appear ahead in staggered lanes.
+      // They use the normal pothole collision rules: a jump clears them;
+      // hitting one causes the existing recoverable pothole bump.
+      const placements = [
+        { lane:-1, z:-118 },
+        { lane:1, z:-148 },
+        { lane:0, z:-178 }
+      ];
+      placements.forEach(({ lane, z }) => {
+        const mesh = createObstacleMesh('pothole');
+        const water = new THREE.Mesh(
+          new THREE.CircleGeometry(0.76, 28),
+          new THREE.MeshStandardMaterial({
+            color:0x38bdf8,
+            emissive:0x075985,
+            emissiveIntensity:0.22,
+            transparent:true,
+            opacity:0.88,
+            roughness:0.16,
+            metalness:0.18
+          })
+        );
+        water.rotation.x = -Math.PI / 2;
+        water.position.set(-0.08, 0.105, -0.035);
+        water.scale.set(1.02, 0.72, 1);
+        mesh.add(water);
+
+        const ripple = new THREE.Mesh(
+          new THREE.TorusGeometry(0.43, 0.018, 6, 28),
+          new THREE.MeshBasicMaterial({ color:0xbae6fd, transparent:true, opacity:0.72 })
+        );
+        ripple.rotation.x = Math.PI / 2;
+        ripple.position.set(-0.08, 0.119, -0.035);
+        ripple.scale.set(1.15, 0.78, 1);
+        mesh.add(ripple);
+
+        mesh.position.set(lane * LANE_WIDTH, 0, z);
+        scene.add(mesh);
+        obstacles.push({
+          type:'pothole', lane, z, mesh,
+          nearMissAwarded:false, smashed:false, smashVx:0, smashVy:0,
+          roadEventObstacle:true, waterlogged:true
+        });
+      });
+    }
+
+    function spawnSikkeShower() {
+      const lanes = [-1,0,1];
+      // Three short lane trails make the shower collectable without filling every lane at once.
+      for (let i = 0; i < 12; i++) {
+        const laneGroup = Math.floor(i / 4);
+        const laneOrder = [0, -1, 1];
+        const lane = laneOrder[laneGroup % laneOrder.length];
+        const z = -116 - (i % 4) * 4.2 - laneGroup * 17;
+        const mesh = createCollectibleMesh('coin');
+        mesh.position.set(lane * LANE_WIDTH,.9,z);
+        scene.add(mesh);
+        collectibles.push({
+          type:'coin', lane, z, baseY:.9, elevated:false, collected:false, mesh,
+          roadEventCoin:true
+        });
+      }
+      roadEventState.coinsCollected = 0;
+    }
+
+    function startRoadEvent(definition) {
+      roadEventState.phase = 'active';
+      roadEventState.timer = definition.duration;
+      roadEventState.current = definition;
+      roadEventState.coinsCollected = 0;
+      setRoadEventVisual(definition.id);
+      trackRajwadaEvent('surprise_road_event_started', {
+        event_id:definition.id,
+        distance_m:Math.floor(Number(game.distance) || 0),
+        duration_seconds:definition.duration
+      });
+      if (definition.id === 'construction') spawnRoadConstructionEvent();
+      if (definition.id === 'monsoon') spawnWaterloggedPotholes();
+      if (definition.id === 'sikke') spawnSikkeShower();
+    }
+
+    function finishRoadEvent(reason = 'completed') {
+      const definition = roadEventState.current;
+      if (!definition) return;
+      let bonusCoins = 0;
+      if (definition.id === 'sikke' && roadEventState.coinsCollected >= 6) {
+        bonusCoins = 15;
+        game.coinsRun += bonusCoins;
+        addFloatingBadge(`SIKKE SHOWER BONUS +${bonusCoins}!`, '#fbbf24');
+      } else if (definition.id === 'sikke') {
+        addFloatingBadge(`${roadEventState.coinsCollected}/6 COINS · KEEP PRACTISING!`, '#fde68a');
+      }
+      trackRajwadaEvent('surprise_road_event_completed', {
+        event_id:definition.id,
+        reason,
+        coins_collected:roadEventState.coinsCollected,
+        bonus_coins:bonusCoins,
+        distance_m:Math.floor(Number(game.distance) || 0)
+      });
+      roadEventState.phase = 'idle';
+      roadEventState.current = null;
+      roadEventState.timer = 0;
+      roadEventState.cooldown = ROAD_EVENT_MIN_COOLDOWN;
+      roadEventState.nextAt = game.distance + ROAD_EVENT_MIN_DISTANCE +
+        Math.random() * (ROAD_EVENT_MAX_DISTANCE - ROAD_EVENT_MIN_DISTANCE);
+      hideRoadEventUi();
+    }
+
+    function cancelRoadEventForPolice() {
+      if (roadEventState.phase === 'active' && roadEventState.current) {
+        trackRajwadaEvent('surprise_road_event_interrupted', {
+          event_id:roadEventState.current.id,
+          reason:'police_chase',
+          distance_m:Math.floor(Number(game.distance) || 0)
+        });
+      }
+      for (let i = obstacles.length - 1; i >= 0; i--) {
+        if (obstacles[i].roadEventObstacle) {
+          scene.remove(obstacles[i].mesh);
+          obstacles.splice(i,1);
+        }
+      }
+      for (let i = collectibles.length - 1; i >= 0; i--) {
+        if (collectibles[i].roadEventCoin) {
+          scene.remove(collectibles[i].mesh);
+          collectibles.splice(i,1);
+        }
+      }
+      roadEventState.phase = 'idle';
+      roadEventState.current = null;
+      roadEventState.timer = 0;
+      roadEventState.cooldown = ROAD_EVENT_MIN_COOLDOWN;
+      roadEventState.nextAt = game.distance + ROAD_EVENT_MIN_DISTANCE +
+        Math.random() * (ROAD_EVENT_MAX_DISTANCE - ROAD_EVENT_MIN_DISTANCE);
+      hideRoadEventUi();
+    }
+
+    function resetRoadEvents() {
+      roadEventState.phase = 'idle';
+      roadEventState.current = null;
+      roadEventState.timer = 0;
+      roadEventState.cooldown = 0;
+      roadEventState.nextAt = 700 + Math.random() * 200;
+      roadEventState.lastId = null;
+      roadEventState.coinsCollected = 0;
+      hideRoadEventUi();
+    }
+
+    function updateSurpriseRoadEvents(dt) {
+      if (game.state !== 'PLAYING') return;
+      if (vipMode.active || vipMode.returnBlend > 0) return;
+      if (game.policeActive) {
+        if (roadEventState.phase !== 'idle') cancelRoadEventForPolice();
+        return;
+      }
+      if (roadEventState.cooldown > 0) {
+        roadEventState.cooldown = Math.max(0, roadEventState.cooldown - dt);
+      }
+      if (roadEventState.phase === 'active') {
+        roadEventState.timer = Math.max(0, roadEventState.timer - dt);
+        const def = roadEventState.current;
+        if (roadEventState.timer <= 0) finishRoadEvent('completed');
+        return;
+      }
+      if (roadEventState.cooldown > 0 || game.distance < roadEventState.nextAt) return;
+      if (collectibles.some(item => !item.collected && item.type === 'vip')) return;
+      // Keep surprise events away from the next scheduled police encounter.
+      if (game.policeNextAt > game.distance && game.policeNextAt - game.distance < 600) {
+        roadEventState.nextAt = game.policeNextAt + 650;
+        return;
+      }
+      const eligible = ROAD_EVENT_DEFS.filter(def => def.id !== roadEventState.lastId);
+      const choices = eligible.length ? eligible : ROAD_EVENT_DEFS;
+      const chosen = choices[Math.floor(Math.random() * choices.length)];
+      roadEventState.lastId = chosen.id;
+      // Surprise events now begin immediately; no countdown or warning screen.
+      startRoadEvent(chosen);
+    }
+
     // Local-only rotating missions. Data-driven catalogue; all mission time uses active gameplay time.
     const MISSION_STREAK_KEY = 'rajwada_rush_mission_streak_v1';
     const MISSION_COOLDOWN_SECONDS = 30;
     const MISSION_COMPLETE_DISPLAY_SECONDS = 2.5;
     const MISSION_DEFS = [
-      { id:'coins_8', action:'coins', title:'COIN SETH', description:'Collect 8 Indori Sikke.', target:8, unit:'coins', seconds:55, rewardCoins:25, difficulty:1, minDist:0 },
-      { id:'coins_15', action:'coins', title:'SIKKE JAMAA KARO', description:'Collect 15 Indori Sikke.', target:15, unit:'coins', seconds:70, rewardCoins:45, difficulty:2, minDist:450 },
-      { id:'dodges_8', action:'dodges', title:'TRAFFIC KA BAAP', description:'Cleanly dodge 8 obstacles.', target:8, unit:'dodges', seconds:55, rewardCoins:35, difficulty:1, minDist:0 },
-      { id:'dodges_14', action:'dodges', title:'MASTER OF THE ROAD', description:'Cleanly dodge 14 obstacles.', target:14, unit:'dodges', seconds:75, rewardCoins:65, difficulty:2, minDist:700 },
-      { id:'jumps_6', action:'jumps', title:'HAWA MEIN BHIYA', description:'Perform 6 jumps.', target:6, unit:'jumps', seconds:55, rewardCoins:30, difficulty:1, minDist:0 },
-      { id:'jumps_10', action:'jumps', title:'INDORI SKY KING', description:'Perform 10 jumps.', target:10, unit:'jumps', seconds:70, rewardCoins:55, difficulty:2, minDist:600 },
-      { id:'slides_6', action:'slides', title:'SLIDE MAARO BHIYA', description:'Perform 6 slides.', target:6, unit:'slides', seconds:55, rewardCoins:30, difficulty:1, minDist:0 },
-      { id:'slides_10', action:'slides', title:'SLIDE USTAAD', description:'Perform 10 slides.', target:10, unit:'slides', seconds:70, rewardCoins:55, difficulty:2, minDist:600 },
-      { id:'distance_650', action:'distance', title:'INDORE EXPRESS', description:'Cover 650 metres before time runs out.', target:650, unit:'m', seconds:65, rewardCoins:50, difficulty:2, minDist:250 },
-      { id:'distance_1100', action:'distance', title:'RAJWADA ROCKET', description:'Cover 1,100 metres before time runs out.', target:1100, unit:'m', seconds:85, rewardCoins:75, difficulty:3, minDist:1200 },
-      { id:'distance_1600', action:'distance', title:'MALWA MARATHON', description:'Cover 1,600 metres before time runs out.', target:1600, unit:'m', seconds:105, rewardCoins:100, difficulty:4, minDist:2600 },
-      { id:'coins_20_hard', action:'coins', title:'SIKKE KA SULTAN', description:'Collect 20 Indori Sikke.', target:20, unit:'coins', seconds:85, rewardCoins:90, difficulty:4, minDist:2200, rewardJeeravan:1 },
-      { id:'dodges_18_hard', action:'dodges', title:'CHAMPION DRIVER', description:'Cleanly dodge 18 obstacles.', target:18, unit:'dodges', seconds:95, rewardCoins:100, difficulty:4, minDist:2500, rewardJeeravan:1 },
-      { id:'jumps_14_hard', action:'jumps', title:'AASMAAN KA BADSHAH', description:'Perform 14 jumps.', target:14, unit:'jumps', seconds:90, rewardCoins:90, difficulty:4, minDist:2500, rewardJeeravan:1 },
-      { id:'slides_14_hard', action:'slides', title:'SLIDE LEGEND', description:'Perform 14 slides.', target:14, unit:'slides', seconds:90, rewardCoins:90, difficulty:4, minDist:2500, rewardJeeravan:1 },
-      { id:'distance_2200_legend', action:'distance', title:'LEGEND OF INDORE', description:'Cover 2,200 metres before time runs out.', target:2200, unit:'m', seconds:125, rewardCoins:100, difficulty:5, minDist:4000, rewardJeeravan:2 }
+      { id:'poha_1_jeeravan', action:'poha', title:'POHA-JALEBI HUNTER', description:'Collect 1 plate of Poha-Jalebi.', target:1, unit:'plates', seconds:60, rewardCoins:0, difficulty:4, minDist:1500, rewardJeeravan:1 },
+      { id:'vehicle_jumps_3', action:'vehicleJumps', title:'GAADI JUMP CHAMPION', description:'Jump cleanly over 3 autos or iBuses.', target:3, unit:'vehicles', seconds:35, rewardCoins:50, difficulty:2, minDist:500 },
+      { id:'vehicle_jumps_5', action:'vehicleJumps', title:'INDORE AIRBORNE ACE', description:'Jump cleanly over 5 autos or iBuses.', target:5, unit:'vehicles', seconds:45, rewardCoins:80, difficulty:3, minDist:1400 },
+      { id:'banner_slides_2', action:'bannerSlides', title:'SWACHH INDORE SLIDER', description:'Slide below 2 Swachh Indore boards.', target:2, unit:'boards', seconds:35, rewardCoins:40, difficulty:2, minDist:350 },
+      { id:'banner_slides_4', action:'bannerSlides', title:'BOARD SLIDE USTAAD', description:'Slide below 4 Swachh Indore boards.', target:4, unit:'boards', seconds:50, rewardCoins:70, difficulty:3, minDist:1200 },
+      { id:'potholes_5', action:'potholeDodges', title:'GADDHA SE BACHKE!', description:'Avoid 5 potholes by jumping over or changing lanes.', target:5, unit:'potholes', seconds:40, rewardCoins:45, difficulty:2, minDist:250 },
+      { id:'potholes_8', action:'potholeDodges', title:'GADDHA GURU', description:'Avoid 8 potholes by jumping over or changing lanes.', target:8, unit:'potholes', seconds:55, rewardCoins:75, difficulty:3, minDist:1300 },
+      { id:'traffic_dodges_5', action:'trafficDodges', title:'TRAFFIC SE BACHKE!', description:'Dodge 5 autos or iBuses without getting hit.', target:5, unit:'vehicles', seconds:35, rewardCoins:40, difficulty:1, minDist:250 },
+      { id:'traffic_dodges_8', action:'trafficDodges', title:'INDORE TRAFFIC PRO', description:'Dodge 8 autos or iBuses without getting hit.', target:8, unit:'vehicles', seconds:50, rewardCoins:75, difficulty:2, minDist:700 },
+      { id:'traffic_dodges_12', action:'trafficDodges', title:'CHAMPION OF INDORE ROADS', description:'Dodge 12 autos or iBuses without getting hit.', target:12, unit:'vehicles', seconds:65, rewardCoins:110, difficulty:4, minDist:2500 },
     ];
     let missionStreak = 0;
     try { missionStreak = Math.max(0, Math.floor(Number(localStorage.getItem(MISSION_STREAK_KEY)) || 0)); } catch (_) {}
@@ -3638,7 +3956,12 @@
       if (fill) fill.style.width = `${Math.min(100, missionProgress / activeMission.target * 100)}%`;
       if (streak) streak.textContent = `🔥 STREAK ${missionStreak}`;
       if (timer) timer.textContent = missionResolved ? (missionComplete ? 'DONE!' : 'TIME UP') : `${Math.max(0, Math.ceil(missionTimeLeft))}s`;
-      if (rewardLine) rewardLine.textContent = `REWARD · ${activeMission.rewardCoins} SIKKE${activeMission.rewardJeeravan ? ` + ${activeMission.rewardJeeravan} JEERAVAN` : ''}`;
+      if (rewardLine) {
+        const rewardParts = [];
+        if (activeMission.rewardCoins > 0) rewardParts.push(`${activeMission.rewardCoins} SIKKE`);
+        if (activeMission.rewardJeeravan) rewardParts.push(`${activeMission.rewardJeeravan} JEERAVAN`);
+        rewardLine.textContent = `REWARD · ${rewardParts.join(' + ')}`;
+      }
     }
 
     function chooseNextMission() {
@@ -3650,11 +3973,9 @@
       const maxDifficulty = game.distance < 900 ? 2 : game.distance < 2200 ? 3 : game.distance < 4200 ? 4 : 5;
       const fairPool = pool.filter(m => m.difficulty <= maxDifficulty);
       if (fairPool.length) pool = fairPool;
-      const weighted = pool.map(m => ({ mission:m, weight:m.difficulty >= 4 ? 0.55 : m.difficulty === 3 ? 0.8 : 1.4 }));
-      const total = weighted.reduce((s, x) => s + x.weight, 0);
-      let roll = Math.random() * total;
-      let chosen = weighted[weighted.length - 1].mission;
-      for (const item of weighted) { roll -= item.weight; if (roll <= 0) { chosen = item.mission; break; } }
+      // Every eligible mission gets an equal random chance. Mission-specific
+      // minimum distances and difficulty gates prevent rare/unfair tasks too early.
+      const chosen = pool[Math.floor(Math.random() * pool.length)];
       missionRecentIds.push(chosen.id);
       if (missionRecentIds.length > 4) missionRecentIds.shift();
       return chosen;
@@ -3695,7 +4016,11 @@
           missionJeeravanReward += jeeravan;
           game.jeeravanRun += jeeravan;
         }
-        missionResultSummary.push(`${activeMission.title}: +${activeMission.rewardCoins} Sikke${jeeravan ? `, +${jeeravan} Jeeravan` : ''}`);
+        const missionRewardText = [
+          activeMission.rewardCoins > 0 ? `+${activeMission.rewardCoins} Sikke` : '',
+          jeeravan ? `+${jeeravan} Jeeravan` : ''
+        ].filter(Boolean).join(', ');
+        missionResultSummary.push(`${activeMission.title}: ${missionRewardText}`);
         trackRajwadaEvent('mission_completed', {
           mission_id: activeMission.id,
           mission_reward: activeMission.rewardCoins,
@@ -3993,7 +4318,6 @@
       if (game.state !== 'PLAYING') return;
       flashPadButton('pad-jump');
       if (!player.isJumping) {
-        incrementMission('jumps');
         player.isJumping = true;
         player.isSliding = false;
         player.slideTimer = 0;
@@ -4014,7 +4338,6 @@
         player.bufferedAction = 'slide';
         player.bufferTimer = 0.24;
       }
-      incrementMission('slides');
       player.isSliding = true;
       player.slideTimer = 0.68;
       audio.playMove(205);
@@ -4202,17 +4525,199 @@
       return true;
     }
 
+    function showVipModeBanner() {
+      let banner = document.getElementById('vip-mode-banner');
+      if (!banner) {
+        banner = document.createElement('div');
+        banner.id = 'vip-mode-banner';
+        banner.style.cssText = [
+          'position:absolute','z-index:35','top:13%','left:50%',
+          'transform:translateX(-50%)','width:max-content','max-width:calc(100% - 28px)',
+          'padding:10px 18px','border:1px solid rgba(253,224,71,.9)',
+          'border-radius:16px','background:linear-gradient(135deg,rgba(120,53,15,.96),rgba(30,41,59,.95))',
+          'box-shadow:0 8px 26px rgba(0,0,0,.35)','color:#fff7cc','text-align:center',
+          'font:900 14px Outfit, sans-serif','letter-spacing:.06em',
+          'pointer-events:none','opacity:0','transition:opacity .45s ease'
+        ].join(';');
+        banner.innerHTML = '<div style="font-size:17px;color:#fde68a">👑 VIP SWAG MODE</div>' +
+          '<div style="font-size:11px;margin-top:3px">AREY! APNE VIP SAHAB AA GAYE!</div>' +
+          '<div id="vip-mode-countdown" style="font-size:12px;margin-top:4px;color:#86efac">15 SECONDS OF ROYAL TREATMENT</div>';
+        const host = document.getElementById('game-container') || document.body;
+        host.appendChild(banner);
+      }
+      vipMode.banner = banner;
+      banner.style.opacity = '1';
+    }
+
+    function spawnVipFlowerPetal() {
+      const colors = [0xf59e0b,0xfbbf24,0xf472b6,0xfb7185,0xffedd5];
+      const material = new THREE.MeshBasicMaterial({
+        color:colors[Math.floor(Math.random()*colors.length)],
+        side:THREE.DoubleSide, transparent:true, opacity:0.95, depthWrite:false
+      });
+      const petal = new THREE.Mesh(new THREE.PlaneGeometry(0.18 + Math.random()*0.12,0.10 + Math.random()*0.08),material);
+      petal.position.set((Math.random()*2-1)*7,2.8+Math.random()*4,-18-Math.random()*85);
+      petal.rotation.set(Math.random()*Math.PI,Math.random()*Math.PI,Math.random()*Math.PI);
+      scene.add(petal);
+      vipMode.petals.push({
+        mesh:petal, vx:(Math.random()*2-1)*0.9,
+        vy:-(1.0+Math.random()*1.5), vz:8+Math.random()*5,
+        spin:(Math.random()*2-1)*3
+      });
+    }
+
+    function vipSafeToActivate() {
+      const nextPoliceGap = game.policeNextAt - game.distance;
+      return game.state === 'PLAYING' && !game.policeActive &&
+        (!roadEventState || roadEventState.phase === 'idle') &&
+        !(nextPoliceGap > 0 && nextPoliceGap < 900);
+    }
+
+    function activateVipMode() {
+      if (vipMode.active || !vipSafeToActivate()) return;
+      vipMode.active = true;
+      vipMode.timer = vipMode.duration;
+      vipMode.returnBlend = 0;
+      vipMode.petalSpawnTimer = 0;
+      vipMode.bannerFade = 1;
+
+      // Clear traffic and non-coin pickups immediately for the VIP procession.
+      for (let i=obstacles.length-1;i>=0;i--) {
+        scene.remove(obstacles[i].mesh);
+        obstacles.splice(i,1);
+      }
+      for (let i=collectibles.length-1;i>=0;i--) {
+        if (collectibles[i].type !== 'coin') {
+          collectibles[i].collected = true;
+          scene.remove(collectibles[i].mesh);
+        }
+      }
+      game.spawnTimer = 0.9;
+      for (let i=0;i<24;i++) spawnVipFlowerPetal();
+      showVipModeBanner();
+      audio.playPowerup();
+      addFloatingBadge('👑 VIP SAHAB! SWAG MODE ON!', '#fde68a');
+      trackRajwadaEvent('vip_mode_activated', {
+        duration_seconds:vipMode.duration,
+        distance_m:Math.floor(Number(game.distance)||0)
+      });
+    }
+
+    function clearVipModeVisuals() {
+      vipMode.active = false;
+      vipMode.timer = 0;
+      vipMode.returnBlend = 0;
+      vipMode.petals.forEach(p => {
+        scene.remove(p.mesh);
+        if (p.mesh.geometry) p.mesh.geometry.dispose();
+        if (p.mesh.material) p.mesh.material.dispose();
+      });
+      vipMode.petals = [];
+      if (vipMode.banner && vipMode.banner.parentNode) {
+        vipMode.banner.parentNode.removeChild(vipMode.banner);
+      }
+      vipMode.banner = null;
+    }
+
+    function updateVipMode(dt) {
+      if (vipMode.active) {
+        vipMode.timer = Math.max(0,vipMode.timer-dt);
+        const fade = vipMode.timer < vipMode.fadeDuration
+          ? Math.max(0,vipMode.timer/vipMode.fadeDuration) : 1;
+        vipMode.bannerFade = fade;
+        if (vipMode.banner) {
+          vipMode.banner.style.opacity = String(fade);
+          const countdown = document.getElementById('vip-mode-countdown');
+          if (countdown) countdown.textContent = `${Math.ceil(vipMode.timer)} SECONDS OF ROYAL TREATMENT`;
+        }
+        // Petal shower eases away during the final three seconds.
+        vipMode.petalSpawnTimer -= dt;
+        if (vipMode.timer > 0 && vipMode.petalSpawnTimer <= 0) {
+          const petalsPerBurst = vipMode.timer < vipMode.fadeDuration ? 1 : 3;
+          for (let i=0;i<petalsPerBurst;i++) spawnVipFlowerPetal();
+          vipMode.petalSpawnTimer = vipMode.timer < vipMode.fadeDuration ? 0.24 : 0.12;
+        }
+        if (vipMode.timer <= 0) {
+          vipMode.active = false;
+          vipMode.returnBlend = vipMode.returnBlendDuration;
+          if (vipMode.banner) {
+            vipMode.banner.style.opacity = '0';
+            const oldBanner = vipMode.banner;
+            setTimeout(() => { if (oldBanner && oldBanner.parentNode) oldBanner.parentNode.removeChild(oldBanner); }, 550);
+            vipMode.banner = null;
+          }
+          trackRajwadaEvent('vip_mode_completed', {
+            distance_m:Math.floor(Number(game.distance)||0)
+          });
+        }
+      } else if (vipMode.returnBlend > 0) {
+        vipMode.returnBlend = Math.max(0,vipMode.returnBlend-dt);
+      }
+
+      const petalFade = vipMode.active
+        ? (vipMode.timer < vipMode.fadeDuration ? vipMode.timer/vipMode.fadeDuration : 1)
+        : 0;
+      for (let i=vipMode.petals.length-1;i>=0;i--) {
+        const p=vipMode.petals[i];
+        p.mesh.position.x += p.vx*dt + Math.sin((p.mesh.position.z+i)*0.08)*dt*0.4;
+        p.mesh.position.y += p.vy*dt;
+        p.mesh.position.z += p.vz*dt;
+        p.mesh.rotation.x += p.spin*dt;
+        p.mesh.rotation.y += p.spin*0.7*dt;
+        p.mesh.rotation.z += p.spin*0.5*dt;
+        p.mesh.material.opacity = Math.max(0,petalFade*0.95);
+        if (p.mesh.position.y < -0.6 || p.mesh.position.z > 16 || p.mesh.material.opacity < 0.03) {
+          scene.remove(p.mesh);
+          p.mesh.geometry.dispose();
+          p.mesh.material.dispose();
+          vipMode.petals.splice(i,1);
+        }
+      }
+    }
+
+    function spawnVipCoinWave(intensity=1) {
+      const lanes=[-1,0,1];
+      const count=Math.round(2*Math.max(0,intensity));
+      if (count <= 0) return;
+      for (const lane of lanes) {
+        for (let n=0;n<count;n++) {
+          const z=-112-n*4.2;
+          const mesh=createCollectibleMesh('coin');
+          mesh.position.set(lane*LANE_WIDTH,0.92,z);
+          scene.add(mesh);
+          collectibles.push({
+            type:'coin',lane,z,baseY:0.92,elevated:false,collected:false,
+            mesh,vipCoin:true
+          });
+        }
+      }
+    }
+
     function spawnWave() {
+      if (vipMode.active) {
+        const intensity = vipMode.timer < vipMode.fadeDuration
+          ? Math.max(0,vipMode.timer/vipMode.fadeDuration) : 1;
+        spawnVipCoinWave(intensity);
+        return;
+      }
+      if (vipMode.returnBlend > 0) {
+        const blend = vipMode.returnBlend / vipMode.returnBlendDuration;
+        // Let the coin shower taper out before ordinary traffic fully returns.
+        if (Math.random() < blend * 0.78) {
+          spawnVipCoinWave(blend);
+          return;
+        }
+      }
       const lanes = [-1, 0, 1];
-      const types = ['pothole', 'banner', 'ibus', 'auto', 'bhandara'];
+      const types = ['pothole', 'banner', 'ibus', 'auto', 'auto', 'ibus', 'bhandara'];
       const mainType = types[Math.floor(Math.random() * types.length)];
       const spawnZ = -112;
 
       // During police chases, normal traffic and pickups continue alongside
       // the scored police hazards. Choose a lane not already occupied near spawn.
-      const blockedLanes = game.policeActive
-        ? new Set(obstacles.filter(o => o.z > -145 && o.z < -70).map(o => o.lane))
-        : new Set();
+      const blockedLanes = new Set(obstacles
+        .filter(o => o.z > -145 && o.z < -70 && (game.policeActive || o.roadEventObstacle))
+        .map(o => o.lane));
       const availableLanes = lanes.filter(lane => !blockedLanes.has(lane));
       if (!availableLanes.length) return;
       const mainLane = availableLanes[Math.floor(Math.random() * availableLanes.length)];
@@ -4255,23 +4760,25 @@
 
       // Secondary obstacle at higher distances while keeping >=1 lane clear
       if (!game.policeActive && game.distance > 320 && Math.random() < 0.45) {
-        const remaining = lanes.filter((l) => l !== mainLane);
-        const secondLane = remaining[Math.floor(Math.random() * remaining.length)];
-        occupiedLanes.push(secondLane);
-        const secondType = ['pothole', 'banner', 'bhandara'][Math.floor(Math.random() * 3)];
-        const secondMesh = createObstacleMesh(secondType);
-        secondMesh.position.set(secondLane * LANE_WIDTH, 0, spawnZ);
-        scene.add(secondMesh);
-        obstacles.push({
-          type: secondType,
-          lane: secondLane,
-          z: spawnZ,
-          mesh: secondMesh,
-          nearMissAwarded: false,
-          smashed: false,
-          smashVx: 0,
-          smashVy: 0
-        });
+        const remaining = lanes.filter((l) => l !== mainLane && !blockedLanes.has(l));
+        if (remaining.length) {
+          const secondLane = remaining[Math.floor(Math.random() * remaining.length)];
+          occupiedLanes.push(secondLane);
+          const secondType = ['auto', 'ibus', 'pothole', 'banner', 'bhandara'][Math.floor(Math.random() * 5)];
+          const secondMesh = createObstacleMesh(secondType);
+          secondMesh.position.set(secondLane * LANE_WIDTH, 0, spawnZ);
+          scene.add(secondMesh);
+          obstacles.push({
+            type: secondType,
+            lane: secondLane,
+            z: spawnZ,
+            mesh: secondMesh,
+            nearMissAwarded: false,
+            smashed: false,
+            smashVx: 0,
+            smashVy: 0
+          });
+        }
       }
 
       // Poha-Jalebi is a high-value bonus, so only spawn it occasionally
@@ -4322,10 +4829,30 @@
         }
       }
 
+      // Rare VIP pass: only appears in ordinary traffic, never during a chase/event.
+      const vipAlreadyOnRoad = collectibles.some(item => !item.collected && item.type === 'vip');
+      const otherSpecialOnRoad = collectibles.some(item =>
+        !item.collected && ['sev','chai','jeeravan','vip'].includes(item.type));
+      if (!game.policeActive && roadEventState.phase === 'idle' &&
+          !(game.policeNextAt > game.distance && game.policeNextAt - game.distance < 1500) &&
+          game.distance >= game.vipNextSpawnDistance &&
+          safeLanes.length > 0 && !vipAlreadyOnRoad && !otherSpecialOnRoad &&
+          Math.random() < 0.12) {
+        const vipLane = safeLanes[Math.floor(Math.random()*safeLanes.length)];
+        const vipMesh = createCollectibleMesh('vip');
+        vipMesh.position.set(vipLane*LANE_WIDTH,1.05,spawnZ-4);
+        scene.add(vipMesh);
+        collectibles.push({
+          type:'vip',lane:vipLane,z:spawnZ-4,baseY:1.05,
+          elevated:false,collected:false,mesh:vipMesh
+        });
+        game.vipNextSpawnDistance = game.distance + 3800 + Math.random()*1000;
+      }
+
       // Specials are rare discoveries, not routine wave contents. Never place two
       // special items close together or allow one to queue behind another.
       const specialAlreadyOnRoad = collectibles.some(item =>
-        !item.collected && ['sev','chai','jeeravan'].includes(item.type));
+        !item.collected && ['sev','chai','jeeravan','vip'].includes(item.type));
       if (safeLanes.length && !specialAlreadyOnRoad &&
           game.distance >= game.specialNextSpawnDistance && Math.random() < 0.035) {
         const chaiEligible = game.distance >= game.chaiNextSpawnDistance;
@@ -4364,6 +4891,37 @@
           life: 0.42 + Math.random() * 0.25
         });
       }
+    }
+
+    function spawnWaterPotholeSplash(x, z) {
+      // A quick fan of blue droplets and a bright expanding surface splash.
+      const dropletGeo = new THREE.SphereGeometry(0.065, 7, 6);
+      const dropletMat = new THREE.MeshBasicMaterial({
+        color:0x7dd3fc, transparent:true, opacity:0.95
+      });
+      for (let i = 0; i < 18; i++) {
+        const mesh = new THREE.Mesh(dropletGeo, dropletMat);
+        mesh.position.set(x + (Math.random() - 0.5) * 0.48, 0.16, z);
+        scene.add(mesh);
+        particles3D.push({
+          mesh,
+          vx:(Math.random() - 0.5) * 5.8,
+          vy:2.2 + Math.random() * 4.8,
+          vz:(Math.random() - 0.5) * 4.5,
+          life:0.42 + Math.random() * 0.22
+        });
+      }
+      const splashRing = new THREE.Mesh(
+        new THREE.TorusGeometry(0.24, 0.045, 7, 22),
+        new THREE.MeshBasicMaterial({ color:0x38bdf8, transparent:true, opacity:0.9 })
+      );
+      splashRing.rotation.x = Math.PI / 2;
+      splashRing.position.set(x, 0.13, z);
+      scene.add(splashRing);
+      particles3D.push({
+        mesh:splashRing, vx:0, vy:0.55, vz:0,
+        life:0.38
+      });
     }
 
     function addFloatingBadge(text, color = '#ffd166') {
@@ -4436,6 +4994,7 @@
 
     function startPoliceChase() {
       if (game.state !== 'PLAYING' || game.policeActive) return;
+      cancelRoadEventForPolice();
       game.policeActive = true;
       game.policeFadeRemaining = 0;
       setPoliceOfficerOpacity(1);
@@ -4774,6 +5333,8 @@
         game.sevNextSpawnDistance = 1100;
         game.jeeravanNextSpawnDistance = 750;
         game.specialNextSpawnDistance = 900;
+        clearVipModeVisuals();
+        game.vipNextSpawnDistance = 2600 + Math.random() * 600;
         game.magnetCoinWaveAt = 0;
         game.magnetCoinWavePending = false;
         game.policeActive = false;
@@ -4792,6 +5353,7 @@
         game.policeChaiTriggered = false;
         game.policeChaiSpawned = false;
         game.policeRevivesUsed = false;
+        resetRoadEvents();
         policeChaser.mesh.visible = false;
         hidePoliceChaseHud();
         game.sceneryTimer = 0;
@@ -4923,6 +5485,7 @@
       // Freeze gameplay immediately. The game-over UI is shown even if audio,
       // character data, storage, or the score animation fails.
       clearPoliceDecisionTimer();
+      clearVipModeVisuals();
       game.state = 'GAMEOVER';
       game.policeActive = false;
       policeChaser.mesh.visible = false;
@@ -4941,6 +5504,7 @@
       const finalJeeravan = Math.max(0, Math.floor(Number(game.jeeravanRun) || 0));
       const finalCoins = Math.max(0, Math.floor(Number(game.coinsRun) || 0));
       const finalCombo = Math.max(1, Math.floor(Number(game.maxCombo) || 1));
+      hideRoadEventUi();
       finalizeRunMission();
       trackRajwadaEvent('game_over', {
         score: finalScore,
@@ -5266,6 +5830,8 @@
       }
       updatePoliceChase(dt);
       if (game.state !== 'PLAYING') return;
+      updateVipMode(dt);
+      updateSurpriseRoadEvents(dt);
       // Slow distance score: skill pickups and clean play matter more than simply surviving.
       game.score += effectiveSpeed * 0.045 * game.mult * dt;
       scrollRoadChunks(effectiveSpeed * dt);
@@ -5374,9 +5940,11 @@
       game.spawnTimer -= dt * (effectiveSpeed / game.baseSpeed);
       if (game.spawnTimer <= 0) {
         spawnWave();
-        game.spawnTimer = game.policeActive
-          ? Math.max(1.35, 1.65 - game.distance * 0.00005)
-          : Math.max(0.56, 0.96 - game.distance * 0.00012);
+        game.spawnTimer = vipMode.active
+          ? 0.9
+          : (game.policeActive
+            ? Math.max(1.35, 1.65 - game.distance * 0.00005)
+            : Math.max(0.56, 0.96 - game.distance * 0.00012));
       }
 
       game.sceneryTimer -= effectiveSpeed * dt;
@@ -5396,9 +5964,13 @@
         }
       }
 
-      // Update Collectibles
-      const magnetActive = player.sevTimer > 0;
-      const magnetRadius = magnetActive ? 1.75 * ch.sevPullMult : 0.48;
+      // VIP mode supplies a temporary automatic magnet for coins, easing out on return.
+      const vipMagnetBlend = vipMode.active ? 1 :
+        (vipMode.returnBlend > 0 ? vipMode.returnBlend / vipMode.returnBlendDuration : 0);
+      const magnetActive = player.sevTimer > 0 || vipMagnetBlend > 0;
+      const magnetRadius = vipMagnetBlend > 0
+        ? 0.48 + 2.92 * vipMagnetBlend
+        : (player.sevTimer > 0 ? 1.75 * ch.sevPullMult : 0.48);
 
       for (let i = collectibles.length - 1; i >= 0; i--) {
         const item = collectibles[i];
@@ -5406,8 +5978,12 @@
         item.mesh.rotation.y += dt * 3.2;
         item.mesh.position.y = item.baseY + Math.sin(performance.now() * 0.006 + item.z) * 0.16;
 
-        if (magnetActive && item.z > -32 && item.z < 3 && Math.abs(item.lane - player.visualX) <= magnetRadius) {
-          item.lane += (player.visualX - item.lane) * Math.min(1, dt * 11 * ch.sevPullMult);
+        const canMagnetPull = player.sevTimer > 0 || (vipMagnetBlend > 0 && item.type === 'coin');
+        if (canMagnetPull && item.z > -32 && item.z < 3 && Math.abs(item.lane - player.visualX) <= magnetRadius) {
+          const pullStrength = vipMagnetBlend > 0
+            ? (6 + 5 * vipMagnetBlend)
+            : (11 * ch.sevPullMult);
+          item.lane += (player.visualX - item.lane) * Math.min(1, dt * pullStrength);
         }
         item.mesh.position.set(item.lane * LANE_WIDTH, item.mesh.position.y, item.z);
 
@@ -5421,12 +5997,17 @@
               item_type: String(item.type || 'unknown'),
               distance_m: Math.floor(Number(game.distance) || 0)
             });
-            if (item.type === 'jeeravan') {
+            if (item.type === 'vip') {
+              activateVipMode();
+            } else if (item.type === 'jeeravan') {
               game.jeeravanRun++;
               audio.playJeeravan(1);
               spawnParticles3D(item.lane * LANE_WIDTH, 1.0, item.z, 0xef4444, 7);
              addFloatingBadge('JEERAVAN +1', '#fca5a5'); } else if (item.type === 'coin') {
               game.coinsRun++;
+              if (item.roadEventCoin && roadEventState.phase === 'active' && roadEventState.current?.id === 'sikke') {
+                roadEventState.coinsCollected++;
+              }
               incrementMission('coins');
               audio.playCoin();
               spawnParticles3D(item.lane * LANE_WIDTH, .95, item.z, 0xfbbf24, 5);
@@ -5437,6 +6018,7 @@
               game.maxCombo = Math.max(game.maxCombo, game.mult);
               game.multTimer = game.multMaxTimer;
               audio.playPohaBonus();
+              incrementMission('poha');
               spawnParticles3D(item.lane * LANE_WIDTH, 1.8, item.z, 0xff9f1c, 12);
               addFloatingBadge(`+${pohaPts} POHA-JALEBI`, '#ffd166');
             } else if (item.type === 'chai') {
@@ -5490,6 +6072,12 @@
           if (!obs.collisionHandled && !obs.smashed) {
             trackObstacleOutcome(obs, 'dodged');
             incrementMission('dodges');
+            if (obs.type === 'auto' || obs.type === 'ibus') {
+              incrementMission('trafficDodges');
+            }
+            if (obs.type === 'pothole' && Math.abs(obs.lane - player.visualX) >= 0.52) {
+              incrementMission('potholeDodges');
+            }
           }
           const distLane = Math.abs(obs.lane - player.visualX);
           if (obs.type === 'bhandara' && distLane < 0.42 && player.y >= 1.15) {
@@ -5563,7 +6151,13 @@
             // Potholes are a recoverable road hazard: jumping clears them.
             // Any grounded/low contact reliably applies the bump penalty.
             const safelyAirborne = player.isJumping && player.y > 0.42;
+            if (safelyAirborne && !game.policeActive) {
+              incrementMission('potholeDodges');
+            }
             if (!safelyAirborne) {
+              if (obs.waterlogged) {
+                spawnWaterPotholeSplash(obs.lane * LANE_WIDTH, 0);
+              }
               game.score = Math.max(0, game.score - 12);
               trackObstacleOutcome(obs, 'hit', { collision_kind: 'pothole_bump' });
               game.shakeTime = 0.24;
@@ -5586,7 +6180,9 @@
               continue;
             }
           } else if (obs.type === 'banner') {
-            if (!player.isSliding && player.y < 1.55) {
+            if (player.isSliding && !game.policeActive) {
+              incrementMission('bannerSlides');
+            } else if (!player.isSliding && player.y < 1.55) {
               collided = true;
               crashReason = 'Swachh Indore overhead banner se sir takra gaya!';
             }
@@ -5615,6 +6211,12 @@
               collided = true;
               crashReason = 'Police checkpoint ke cones se takkar ho gayi!';
             }
+          }
+
+          if (!collided && !game.policeActive && player.isJumping &&
+              ((obs.type === 'auto' && player.y >= 1.45) ||
+               (obs.type === 'ibus' && player.y >= 2.25))) {
+            incrementMission('vehicleJumps');
           }
 
           if (collided) {
