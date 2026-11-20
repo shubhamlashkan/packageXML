@@ -1185,6 +1185,50 @@
       border-color: rgba(56, 189, 248, 0.45);
       color: #e0f2fe;
     }
+    /* Gameplay polish pass: clearer feedback without blocking the road. */
+    #tutorial-card {
+      position:absolute; z-index:32; top:19%; left:50%; transform:translateX(-50%);
+      width:min(340px,calc(100vw - 34px)); padding:11px 14px;
+      border:1px solid rgba(125,211,252,.55); border-radius:15px;
+      background:linear-gradient(120deg,rgba(8,47,73,.95),rgba(15,23,42,.94));
+      box-shadow:0 10px 28px rgba(0,0,0,.32); color:#fff; text-align:center; pointer-events:auto;
+    }
+    .tutorial-kicker,.daily-kicker { color:#7dd3fc; font:900 .62rem 'Outfit',sans-serif; letter-spacing:.13em; }
+    #tutorial-message { margin-top:4px; font:900 .95rem 'Outfit',sans-serif; }
+    .tutorial-sub { margin-top:4px; color:#dbeafe; font-size:.68rem; line-height:1.35; }
+    #tutorial-skip { margin-top:8px; padding:5px 12px; border:1px solid rgba(255,255,255,.28); border-radius:99px; color:#fff; background:rgba(255,255,255,.12); font:800 .65rem 'Outfit',sans-serif; }
+    #daily-challenge-card {
+      position:absolute; z-index:23; top:calc(max(12px,env(safe-area-inset-top)) + 94px); right:14px;
+      width:min(190px,43vw); padding:8px 10px; border-radius:12px;
+      background:rgba(15,23,42,.82); border:1px solid rgba(250,204,21,.38);
+      box-shadow:0 6px 18px rgba(0,0,0,.22); color:#fff; pointer-events:none;
+    }
+    .daily-kicker { color:#fde68a; font-size:.53rem; }
+    #daily-challenge-text { margin-top:3px; font:800 .65rem 'Outfit',sans-serif; line-height:1.25; }
+    #daily-challenge-track { height:4px; margin-top:6px; border-radius:99px; overflow:hidden; background:rgba(255,255,255,.18); }
+    #daily-challenge-fill { width:0%; height:100%; border-radius:99px; background:linear-gradient(90deg,#22c55e,#facc15); transition:width .2s ease; }
+    #mission-card { border-color:rgba(250,204,21,.72); box-shadow:0 8px 26px rgba(0,0,0,.36),0 0 18px rgba(250,204,21,.12); }
+    #mission-card.mission-pulse { animation:mission-pulse .42s ease-out; }
+    @keyframes mission-pulse { 0%{transform:translateX(-50%) scale(1)} 45%{transform:translateX(-50%) scale(1.045)} 100%{transform:translateX(-50%) scale(1)} }
+    .tactile-pill-btn { min-width:58px; min-height:50px; touch-action:manipulation; }
+    #game-shell.police-danger:after {
+      content:""; position:absolute; inset:0; z-index:14; pointer-events:none;
+      background:radial-gradient(ellipse at center,transparent 48%,rgba(185,28,28,.34) 100%);
+      animation:danger-pulse .55s ease-in-out infinite alternate;
+    }
+    @keyframes danger-pulse { from{opacity:.35} to{opacity:.9} }
+    .police-pay-btn:disabled { opacity:.42; filter:grayscale(.65); cursor:not-allowed; }
+    @media (max-width:768px) {
+      /* Mobile play is gesture-only: keep the full road view unobstructed. */
+      .hud-bottom-controls { display:none !important; }
+      #daily-challenge-card { top:100px; right:10px; }
+      #tutorial-card { top:22%; }
+      #mission-card { bottom:112px; }
+    }
+    @media (max-height:620px) {
+      #daily-challenge-card { top:84px; }
+      #tutorial-card { top:16%; }
+    }
   </style>
   <!-- Google tag (gtag.js) - Rajwada Rush only -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-HG116EGWKN"></script>
@@ -1300,6 +1344,17 @@
         </div>
         <div id="mission-progress-track"><div id="mission-progress-fill"></div></div>
         <div id="mission-reward-line">REWARD · 25 INDOORI SIKKE</div>
+      </div>
+      <div id="tutorial-card" class="hidden" aria-live="polite">
+        <div class="tutorial-kicker">QUICK TRAINING</div>
+        <div id="tutorial-message">JUMP over a low obstacle</div>
+        <div class="tutorial-sub">Swipe up to jump · down to slide · left/right to change lanes</div>
+        <button type="button" id="tutorial-skip">GOT IT</button>
+      </div>
+      <div id="daily-challenge-card" class="hidden" aria-live="polite">
+        <div class="daily-kicker">TODAY'S RUN CHALLENGE</div>
+        <div id="daily-challenge-text">Reach 8,000m in one run · +50 Sikke</div>
+        <div id="daily-challenge-track"><div id="daily-challenge-fill"></div></div>
       </div>
 
       <!-- Non-Blocking Kinetic Zone Transition Toast -->
@@ -1444,7 +1499,7 @@
         <div class="modal-header">
           <div style="font-size:2.1rem;line-height:1.1;">👮🏽‍♂️ 🚨</div>
           <h2 class="modal-title">BHIYA PAKDA GAYA!</h2>
-          <p class="modal-sub">Pay 10 Jeeravan within 5 seconds to continue!</p>
+          <p id="police-pay-status" class="modal-sub">Pay 10 Jeeravan within 5 seconds to continue!</p>
         </div>
         <div class="metric-card" style="text-align:center;margin-bottom:12px;">
           <div class="metric-lbl">JEERAVAN COLLECTED THIS RUN</div>
@@ -2126,7 +2181,7 @@
     // ==========================================================================
     const canvas = document.getElementById('game-canvas');
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.6 : 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -2963,7 +3018,8 @@
       const group = new THREE.Group();
 
       if (type === 'pothole') {
-        // Indore Road Pothole (Gaddha) + Warning Cone
+        // Natural broken-asphalt gaddha: the crater and fractured road edge
+        // communicate the hazard without a bright red target-style marker.
         const crater = new THREE.Mesh(
           new THREE.CylinderGeometry(1.12, 0.92, 0.10, 22),
           new THREE.MeshStandardMaterial({ color: 0x02040a, roughness: 1.0 })
@@ -2972,38 +3028,36 @@
         crater.scale.set(1.0, 1, 0.78);
         group.add(crater);
 
-        // Broken asphalt chunks make the road hazard silhouette clearer from afar.
-        const brokenRoadMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.96 });
-        for (let k = 0; k < 5; k++) {
-          const angle = (Math.PI * 2 * k) / 5;
-          const chip = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.07, 0.18), brokenRoadMat);
-          chip.position.set(Math.cos(angle) * 1.03, 0.065, Math.sin(angle) * 0.70);
-          chip.rotation.y = angle;
-          group.add(chip);
-        }
-
-        const rim = new THREE.Mesh(
-          new THREE.TorusGeometry(0.95, 0.09, 8, 22),
-          new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.9 })
-        );
-        rim.rotation.x = Math.PI / 2;
-        rim.position.y = 0.03;
-        rim.scale.set(1.08, 0.76, 1);
-        group.add(rim);
-
-        // Orange Traffic Cone beside the gaddha
-        const cone = new THREE.Mesh(
-          new THREE.ConeGeometry(0.22, 0.65, 14),
-          new THREE.MeshStandardMaterial({ color: 0xf97316 })
-        );
-        cone.position.set(0.88, 0.34, 0.25);
-        cone.castShadow = true;
-        const stripe = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.11, 0.16, 0.16, 14),
-          new THREE.MeshBasicMaterial({ color: 0xffffff })
-        );
-        stripe.position.set(0.88, 0.36, 0.25);
-        group.add(cone, stripe);
+        const brokenRoadMat = new THREE.MeshStandardMaterial({ color: 0x303944, roughness: 0.98 });
+        const edgeMat = new THREE.MeshStandardMaterial({ color: 0x59616a, roughness: 0.96 });
+        // Uneven asphalt fragments around the crater; intentionally irregular.
+        const fragments = [
+          [-1.02,0.055,-0.28,0.34,0.07,0.16,-0.25],
+          [0.94,0.052,-0.48,0.30,0.06,0.14,0.42],
+          [-0.72,0.058,0.61,0.38,0.07,0.13,0.58],
+          [0.82,0.052,0.54,0.28,0.06,0.16,-0.52],
+          [0.12,0.05,-0.79,0.34,0.06,0.12,0.18],
+          [-0.12,0.052,0.82,0.30,0.06,0.13,-0.12]
+        ];
+        fragments.forEach(([x,y,z,w,h,d,rot],idx) => {
+          const piece = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), idx%2 ? edgeMat : brokenRoadMat);
+          piece.position.set(x,y,z);
+          piece.rotation.y=rot;
+          group.add(piece);
+        });
+        // Fine fracture lines radiate into the surrounding asphalt.
+        const crackMat = new THREE.MeshStandardMaterial({ color:0x171d24, roughness:1 });
+        [
+          [-1.16,0.072,-0.10,0.42,0.018,0.035,-0.42],
+          [1.12,0.071,0.02,0.38,0.018,0.032,0.50],
+          [-0.54,0.071,0.82,0.34,0.018,0.03,0.28],
+          [0.42,0.071,-0.88,0.36,0.018,0.03,-0.36]
+        ].forEach(([x,y,z,w,h,d,rot]) => {
+          const crack=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),crackMat);
+          crack.position.set(x,y,z);
+          crack.rotation.y=rot;
+          group.add(crack);
+        });
       } else if (type === 'banner') {
         // High Swachh Indore Overhead Arch Banner (Slide Under or Jump Over)
         const poleMat = new THREE.MeshStandardMaterial({ color: 0xcbd5e1, metalness: 0.6 });
@@ -3022,6 +3076,15 @@
         board.position.set(0, 2.18, 0);
         board.castShadow = true;
         group.add(board);
+        const reflectorMat = new THREE.MeshStandardMaterial({
+          color:0xe2f5dc, emissive:0x315b38, emissiveIntensity:0.12,
+          roughness:0.55, metalness:0.12
+        });
+        [-1.08,1.08].forEach(px => {
+          const reflector = new THREE.Mesh(new THREE.CylinderGeometry(0.086,0.086,0.20,10),reflectorMat);
+          reflector.position.set(px,0.38,0);
+          group.add(reflector);
+        });
       } else if (type === 'bhandara') {
         // Festive Indore Bhandara Tent, Kadhai & Pangat Devotees (Jump Over!)
         const tentMat = new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.7 });
@@ -3230,6 +3293,186 @@
           const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.18, 16), wheelMat);
           wheel.rotation.z = Math.PI/2; wheel.position.set(x, 0.34, -0.58); group.add(wheel);
         });
+      } else if (['sabjithela', 'panipuri', 'bakedsamosa', 'paanthela'].includes(type)) {
+        // Street-vendor carts: a shared sturdy wooden thela with distinct, readable
+        // food displays. Only the vegetable seller has a pushing vendor.
+        const wood = new THREE.MeshStandardMaterial({ color:0x8b5a2b, roughness:0.9 });
+        const darkWood = new THREE.MeshStandardMaterial({ color:0x4b2e1a, roughness:0.95 });
+        const metal = new THREE.MeshStandardMaterial({ color:0x64748b, metalness:0.62, roughness:0.42 });
+        const brass = new THREE.MeshStandardMaterial({ color:0xc18a36, metalness:0.48, roughness:0.42 });
+        const cream = new THREE.MeshStandardMaterial({ color:0xf4e7c7, roughness:0.82 });
+        const green = new THREE.MeshStandardMaterial({ color:0x238443, roughness:0.78 });
+        const red = new THREE.MeshStandardMaterial({ color:0xc9362b, roughness:0.72 });
+        const bed = new THREE.Mesh(new THREE.BoxGeometry(2.05,0.20,1.58),wood);
+        bed.position.set(0,0.86,0); bed.castShadow=true; group.add(bed);
+        const front = new THREE.Mesh(new THREE.BoxGeometry(2.08,0.48,0.12),darkWood);
+        front.position.set(0,1.12,0.79); group.add(front);
+        const rear = new THREE.Mesh(new THREE.BoxGeometry(2.08,0.42,0.10),wood);
+        rear.position.set(0,1.08,-0.78); group.add(rear);
+        [-0.99,0.99].forEach(x=>{
+          const side=new THREE.Mesh(new THREE.BoxGeometry(0.11,0.44,1.58),wood);
+          side.position.set(x,1.08,0); group.add(side);
+        });
+        [-0.72,0.72].forEach(x=>{
+          const axle=new THREE.Mesh(new THREE.CylinderGeometry(0.075,0.075,1.55,10),metal);
+          axle.rotation.z=Math.PI/2; axle.position.set(0,0.43,-0.12); group.add(axle);
+          const wheel=new THREE.Mesh(new THREE.TorusGeometry(0.36,0.075,10,22),darkWood);
+          wheel.position.set(x,0.43,-0.12); wheel.rotation.y=Math.PI/2; group.add(wheel);
+          const hub=new THREE.Mesh(new THREE.CylinderGeometry(0.105,0.105,0.22,14),brass);
+          hub.rotation.z=Math.PI/2; hub.position.set(x,0.43,-0.12); group.add(hub);
+          const spokeMat=new THREE.MeshStandardMaterial({color:0xb98a53,roughness:0.85});
+          for(let s=0;s<8;s++){
+            const a=s*Math.PI/4;
+            const spoke=new THREE.Mesh(new THREE.BoxGeometry(0.035,0.55,0.045),spokeMat);
+            spoke.position.set(x,0.43+Math.sin(a)*0.17,-0.12+Math.cos(a)*0.17);
+            spoke.rotation.x=-a; group.add(spoke);
+          }
+        });
+        // Long rear handles make the cart read as a hand-pushed thela.
+        const handleParts=[];
+        [-0.66,0.66].forEach(x=>{
+          const handle=new THREE.Mesh(new THREE.CylinderGeometry(0.045,0.055,1.02,9),metal);
+          handle.rotation.x=Math.PI/2; handle.position.set(x,0.93,-1.22); group.add(handle);
+          handleParts.push(handle);
+        });
+
+        if (type === 'sabjithela') {
+          // Produce arranged in distinct shallow crates; varied shapes avoid a toy-like pile.
+          const crateMat=new THREE.MeshStandardMaterial({color:0xb77935,roughness:0.96});
+          const crates=[-0.64,0,0.64];
+          crates.forEach((x,i)=>{
+            const crate=new THREE.Mesh(new THREE.BoxGeometry(0.58,0.25,0.62),crateMat);
+            crate.position.set(x,1.10,0.02); group.add(crate);
+            const produce = i===0
+              ? [[0xef4444,'round'],[0xdc3028,'round'],[0xe85d36,'round'],[0xf97316,'round']]
+              : i===1
+              ? [[0x9b7653,'potato'],[0xb18a62,'potato'],[0x8f6b49,'potato'],[0xa67c52,'potato']]
+              : [[0xf5f0e6,'cauli'],[0xf5f0e6,'cauli'],[0x249447,'leaf'],[0x16a34a,'leaf']];
+            produce.forEach((p,j)=>{
+              const geo=p[1]==='potato'?new THREE.SphereGeometry(0.15,10,8):
+                p[1]==='cauli'?new THREE.IcosahedronGeometry(0.17,1):
+                p[1]==='leaf'?new THREE.SphereGeometry(0.18,9,7):new THREE.SphereGeometry(0.16,12,9);
+              const veg=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:p[0],roughness:0.78}));
+              veg.position.set(x+(j%2?0.13:-0.13),1.34+(j%2)*0.035,0.02+(j<2?-0.14:0.14));
+              veg.scale.set(p[1]==='leaf'?1.25:1,p[1]==='potato'?0.72:0.9,p[1]==='leaf'?0.55:1);
+              group.add(veg);
+            });
+          });
+          // Onions, green chillies and lemons as small, recognizable accents.
+          [[-0.82,0x9b4b8a],[-0.72,0xb34d83],[0.78,0x22a447],[0.86,0x84cc16],[0.58,0xfacc15]].forEach((v,i)=>{
+            const item=new THREE.Mesh(new THREE.SphereGeometry(0.095,10,8),new THREE.MeshStandardMaterial({color:v[1],roughness:0.8}));
+            item.position.set(v[0],1.40,0.36+(i%2)*0.10); item.scale.set(1,0.8,1); group.add(item);
+          });
+          // No nameboard on the vegetable thela, as requested.
+          // Seller: simple but recognizable street vendor in kurta, scarf and trousers.
+          const skin=new THREE.MeshStandardMaterial({color:0xb9784e,roughness:0.86});
+          const kurta=new THREE.MeshStandardMaterial({color:0x2f855a,roughness:0.9});
+          const cloth=new THREE.MeshStandardMaterial({color:0xe9bd57,roughness:0.9});
+          const pants=new THREE.MeshStandardMaterial({color:0x334155,roughness:0.92});
+          const vendor=new THREE.Group();
+          vendor.position.set(0,0,-1.35);
+          const torso=new THREE.Mesh(new THREE.CylinderGeometry(0.24,0.31,0.78,10),kurta);
+          torso.position.y=1.43; vendor.add(torso);
+          const head=new THREE.Mesh(new THREE.SphereGeometry(0.22,12,10),skin);
+          head.position.set(0,2.00,0.02); vendor.add(head);
+          const turban=new THREE.Mesh(new THREE.SphereGeometry(0.235,12,8),cloth);
+          turban.scale.set(1,0.55,1); turban.position.set(0,2.15,0.02); vendor.add(turban);
+          const legParts=[];
+          [-0.13,0.13].forEach((x,i)=>{
+            const leg=new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.105,0.66,9),pants);
+            leg.position.set(x,0.88,0.02); vendor.add(leg); legParts.push(leg);
+          });
+          const armParts=[];
+          [-1,1].forEach(side=>{
+            const upper=new THREE.Mesh(new THREE.CylinderGeometry(0.075,0.09,0.48,9),kurta);
+            upper.position.set(side*0.29,1.55,0.12); upper.rotation.x=0.78; upper.rotation.z=side*0.18;
+            vendor.add(upper); armParts.push(upper);
+            const hand=new THREE.Mesh(new THREE.SphereGeometry(0.085,9,8),skin);
+            hand.position.set(side*0.31,1.35,0.42); vendor.add(hand);
+          });
+          group.add(vendor);
+          group.userData.vendorParts={vendor,legParts,armParts,wheels:group.children.filter(m=>m.geometry&&m.geometry.type==='TorusGeometry')};
+        } else if (type === 'panipuri') {
+          // Steel serving bowls with visible pani/chutney and crisp puris.
+          const bowlMat=new THREE.MeshStandardMaterial({color:0xb9c4ca,metalness:0.78,roughness:0.28});
+          [-0.62,0,0.62].forEach((x,i)=>{
+            const bowl=new THREE.Mesh(new THREE.CylinderGeometry(0.28,0.22,0.23,18),bowlMat);
+            bowl.position.set(x,1.12,0.05); group.add(bowl);
+            const liquid=new THREE.Mesh(new THREE.CircleGeometry(0.235,18),new THREE.MeshStandardMaterial({color:[0x8a5a25,0x4f9b35,0x6b3d25][i],roughness:0.3}));
+            liquid.rotation.x=-Math.PI/2; liquid.position.set(x,1.245,0.05); group.add(liquid);
+          });
+          for(let i=0;i<12;i++){
+            const x=-0.78+(i%4)*0.38, z=-0.34+Math.floor(i/4)*0.32;
+            const puri=new THREE.Mesh(new THREE.SphereGeometry(0.135,12,9),new THREE.MeshStandardMaterial({color:0xd9a34c,roughness:0.72}));
+            puri.scale.set(1,0.78,1); puri.position.set(x,1.36+(i%3)*0.018,z); group.add(puri);
+            const hole=new THREE.Mesh(new THREE.SphereGeometry(0.045,8,6),darkWood);
+            hole.position.set(x,1.46+(i%3)*0.018,z+0.025); group.add(hole);
+          }
+          const sign=createSignTexture('PANI PURI','INDORI CHAT','#14532d','#fff7d6');
+          const board=new THREE.Mesh(new THREE.PlaneGeometry(1.12,0.34),new THREE.MeshBasicMaterial({map:sign}));
+          board.position.set(0,1.45,0.87); group.add(board);
+        } else if (type === 'bakedsamosa') {
+          // Golden triangular baked samosas in a warm glass-front display.
+          const glass=new THREE.MeshStandardMaterial({color:0xdff6ff,transparent:true,opacity:0.20,roughness:0.18,metalness:0.12});
+          const frame=new THREE.MeshStandardMaterial({color:0x8b5a2b,roughness:0.8});
+          const caseBase=new THREE.Mesh(new THREE.BoxGeometry(1.68,0.12,0.88),frame);
+          caseBase.position.set(0,1.15,0.02); group.add(caseBase);
+          const top=new THREE.Mesh(new THREE.BoxGeometry(1.72,0.08,0.92),frame);
+          top.position.set(0,1.72,0.02); group.add(top);
+          [-0.82,0.82].forEach(x=>{
+            const pane=new THREE.Mesh(new THREE.BoxGeometry(0.07,0.55,0.88),glass);
+            pane.position.set(x,1.44,0.02); group.add(pane);
+          });
+          const frontPane=new THREE.Mesh(new THREE.BoxGeometry(1.58,0.55,0.045),glass);
+          frontPane.position.set(0,1.44,0.46); group.add(frontPane);
+          const samosaMat=new THREE.MeshStandardMaterial({color:0xd9902f,roughness:0.82});
+          for(let i=0;i<8;i++){
+            const samosa=new THREE.Mesh(new THREE.ConeGeometry(0.20,0.36,3),samosaMat);
+            samosa.rotation.y=Math.PI/6+(i%2)*0.15;
+            samosa.position.set(-0.57+(i%4)*0.38,1.34+(Math.floor(i/4))*0.12,-0.22+Math.floor(i/4)*0.36);
+            group.add(samosa);
+          }
+          const chutney1=new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,0.10,12),new THREE.MeshStandardMaterial({color:0x9ca3af,metalness:0.65,roughness:0.35}));
+          chutney1.position.set(-0.65,1.03,0.58); group.add(chutney1);
+          const sign=createSignTexture('BAKED SAMOSA','FRESH & HOT','#9a3412','#fff1d6');
+          const board=new THREE.Mesh(new THREE.PlaneGeometry(1.30,0.34),new THREE.MeshBasicMaterial({map:sign}));
+          board.position.set(0,1.90,0.87); group.add(board);
+        } else if (type === 'paanthela') {
+          // Fresh betel leaves, lime/chutney tins and supari/saunf jars.
+          for(let i=0;i<8;i++){
+            const leaf=new THREE.Mesh(new THREE.SphereGeometry(0.20,10,8),green);
+            leaf.scale.set(0.72,0.10,1.35);
+            leaf.rotation.y=(i%2?0.48:-0.48);
+            leaf.position.set(-0.62+(i%4)*0.40,1.25+(i%2)*0.035,-0.20+Math.floor(i/4)*0.42);
+            group.add(leaf);
+            const vein=new THREE.Mesh(new THREE.BoxGeometry(0.018,0.018,0.30),new THREE.MeshStandardMaterial({color:0x9bd17c}));
+            vein.position.copy(leaf.position); vein.position.y+=0.02; group.add(vein);
+          }
+          [ -0.66,0,0.66 ].forEach((x,i)=>{
+            const jar=new THREE.Mesh(new THREE.CylinderGeometry(0.14,0.14,0.25,14),i===1?red:brass);
+            jar.position.set(x,1.10,0.54); group.add(jar);
+            const lid=new THREE.Mesh(new THREE.CylinderGeometry(0.15,0.15,0.045,14),metal);
+            lid.position.set(x,1.25,0.54); group.add(lid);
+          });
+          const sign=createSignTexture('PAAN CORNER','MEETHA • SAADA • ZARDA','#166534','#fff7d6');
+          const board=new THREE.Mesh(new THREE.PlaneGeometry(1.18,0.34),new THREE.MeshBasicMaterial({map:sign}));
+          board.position.set(0,1.48,0.87); group.add(board);
+        }
+      }
+
+      const cueColor = ({
+        bhandara:0xef4444, policebarrier:0xef4444,
+        auto:0xfacc15, ibus:0xfacc15, sabjithela:0xfacc15, panipuri:0xfacc15, bakedsamosa:0xfacc15, paanthela:0xfacc15,
+        policecones:0xfacc15
+      })[type];
+      if (cueColor !== undefined) {
+        const cueRing = new THREE.Mesh(
+          new THREE.RingGeometry(0.62,0.82,24),
+          new THREE.MeshBasicMaterial({color:cueColor,transparent:true,opacity:0.54,side:THREE.DoubleSide})
+        );
+        cueRing.rotation.x = -Math.PI/2;
+        cueRing.position.set(0,0.065,-0.86);
+        group.add(cueRing);
       }
 
       return group;
@@ -3563,13 +3806,19 @@
       multMaxTimer: 4.5,
       speed: 24.0,
       baseSpeed: 24.0,
-      maxSpeed: 52.0,
+      maxSpeed: 48.0,
       zoneIndex: 0,
       spawnTimer: 0.55,
       chaiNextSpawnDistance: 1500,
       sevNextSpawnDistance: 1100,
       jeeravanNextSpawnDistance: 750,
-      specialNextSpawnDistance: 900,
+      specialNextSpawnDistance: 650,
+      earlyPowerupSpawned: false,
+      tutorialActive: false,
+      tutorialStep: 0,
+      dailyTarget: 800,
+      dailyClaimed: false,
+      dailyStorageKey: '',
       vipNextSpawnDistance: 2600,
       magnetCoinWaveAt: 0,
       magnetCoinWavePending: false,
@@ -3632,8 +3881,8 @@
 
     // A rare collectible activates a temporary VIP procession; no permanent unlock.
     const vipMode = {
-      active:false, timer:0, duration:15, fadeDuration:3,
-      returnBlend:0, returnBlendDuration:1.8, petalSpawnTimer:0,
+      active:false, timer:0, duration:8, fadeDuration:1.5,
+      returnBlend:0, returnBlendDuration:1.2, petalSpawnTimer:0,
       petals:[], banner:null, bannerFade:1
     };
 
@@ -4085,6 +4334,12 @@
       if (next === missionProgress) return;
       missionProgress = next;
       renderMissionHud(true);
+      const missionCard = document.getElementById('mission-card');
+      if (missionCard) {
+        missionCard.classList.remove('mission-pulse');
+        void missionCard.offsetWidth;
+        missionCard.classList.add('mission-pulse');
+      }
       const analyticsStep = activeMission.action === 'distance' ? 100 : 1;
       if (missionProgress >= activeMission.target ||
           missionProgress - missionLastAnalyticsProgress >= analyticsStep) {
@@ -4282,6 +4537,7 @@
 
     function moveLeft() {
       if (game.state !== 'PLAYING') return;
+      advanceTutorial('lane');
       flashPadButton('pad-left');
       if (player.lane > -1) {
         player.lane--;
@@ -4292,6 +4548,7 @@
 
     function moveRight() {
       if (game.state !== 'PLAYING') return;
+      advanceTutorial('lane');
       flashPadButton('pad-right');
       if (player.lane < 1) {
         player.lane++;
@@ -4316,6 +4573,7 @@
 
     function jump() {
       if (game.state !== 'PLAYING') return;
+      advanceTutorial('jump');
       flashPadButton('pad-jump');
       if (!player.isJumping) {
         player.isJumping = true;
@@ -4332,6 +4590,7 @@
 
     function slide() {
       if (game.state !== 'PLAYING') return;
+      advanceTutorial('slide');
       flashPadButton('pad-slide');
       if (player.isJumping) {
         player.vy = -19.5;
@@ -4397,7 +4656,7 @@
       if (swipeTriggered || game.state !== 'PLAYING' || e.touches.length === 0) return;
       const dx = e.touches[0].clientX - touchStartX;
       const dy = e.touches[0].clientY - touchStartY;
-      const threshold = 24;
+      const threshold = Math.max(34, Math.min(48, window.innerWidth * 0.075));
 
       if (Math.abs(dx) > threshold || Math.abs(dy) > threshold) {
         swipeTriggered = true;
@@ -4410,6 +4669,8 @@
         }
       }
     }, { passive: false });
+    canvas.addEventListener('touchend', () => { swipeTriggered = false; }, { passive: true });
+    canvas.addEventListener('touchcancel', () => { swipeTriggered = false; }, { passive: true });
 
     function bindTactilePad(id, fn) {
       const btn = document.getElementById(id);
@@ -4427,7 +4688,12 @@
     bindTactilePad('pad-right', moveRight);
     bindTactilePad('pad-jump', jump);
     bindTactilePad('pad-slide', slide);
-
+    document.getElementById('tutorial-skip')?.addEventListener('click', () => {
+      game.tutorialActive = false;
+      game.tutorialStep = 3;
+      try { localStorage.setItem('rajwadaRushTutorialDone','1'); } catch (_) {}
+      document.getElementById('tutorial-card')?.classList.add('hidden');
+    });
     // ==========================================================================
     // 9. STATE TRANSITIONS, SPAWNERS & 3D CLEANUP
     // ==========================================================================
@@ -4709,8 +4975,23 @@
         }
       }
       const lanes = [-1, 0, 1];
-      const types = ['pothole', 'banner', 'ibus', 'auto', 'auto', 'ibus', 'bhandara'];
-      const mainType = types[Math.floor(Math.random() * types.length)];
+      const monsoonActive = !!(roadEventState && roadEventState.phase === 'active' &&
+        roadEventState.current && roadEventState.current.id === 'monsoon');
+      const everydayTypes = monsoonActive
+        ? ['pothole', 'ibus', 'auto', 'auto', 'ibus', 'bhandara']
+        : ['pothole', 'banner', 'ibus', 'auto', 'auto', 'ibus', 'bhandara'];
+      const vendorTypes = ['sabjithela', 'panipuri', 'bakedsamosa', 'paanthela'];
+      const nextPoliceGap = game.policeNextAt - game.distance;
+      // Vendor carts are rare set pieces: keep them away from police warnings/chases,
+      // active road events and VIP sequences. Only the primary obstacle can be a cart.
+      const allowVendorCart = !game.policeActive &&
+        (!roadEventState || roadEventState.phase !== 'active') &&
+        (!vipMode || (!vipMode.active && !(vipMode.returnBlend > 0))) &&
+        !(nextPoliceGap > 0 && nextPoliceGap < 1100);
+      const spawnVendorCart = allowVendorCart && Math.random() < 0.12;
+      const mainType = spawnVendorCart
+        ? vendorTypes[Math.floor(Math.random() * vendorTypes.length)]
+        : everydayTypes[Math.floor(Math.random() * everydayTypes.length)];
       const spawnZ = -112;
 
       // During police chases, normal traffic and pickups continue alongside
@@ -4759,12 +5040,15 @@
       });
 
       // Secondary obstacle at higher distances while keeping >=1 lane clear
-      if (!game.policeActive && game.distance > 320 && Math.random() < 0.45) {
+      if (!game.policeActive && game.distance > 320 && Math.random() < (game.distance > 2200 ? 0.30 : 0.36)) {
         const remaining = lanes.filter((l) => l !== mainLane && !blockedLanes.has(l));
         if (remaining.length) {
           const secondLane = remaining[Math.floor(Math.random() * remaining.length)];
           occupiedLanes.push(secondLane);
-          const secondType = ['auto', 'ibus', 'pothole', 'banner', 'bhandara'][Math.floor(Math.random() * 5)];
+          // Secondary obstacles stay conventional so a vendor cart never creates
+          // an unnecessarily dense multi-lane obstacle pattern.
+          const secondaryTypes = ['auto', 'ibus', 'pothole', 'banner', 'bhandara'];
+          const secondType = secondaryTypes[Math.floor(Math.random() * secondaryTypes.length)];
           const secondMesh = createObstacleMesh(secondType);
           secondMesh.position.set(secondLane * LANE_WIDTH, 0, spawnZ);
           scene.add(secondMesh);
@@ -4814,18 +5098,18 @@
             mesh.position.set(trailLane*LANE_WIDTH,.9,z); scene.add(mesh);
             collectibles.push({type:'coin',lane:trailLane,z,baseY:.9,elevated:false,collected:false,mesh});
           }
-        } else if (roll < 0.88 && game.distance >= game.jeeravanNextSpawnDistance &&
-                   game.distance >= game.specialNextSpawnDistance &&
-                   !collectibles.some(item => !item.collected && ['sev','chai','jeeravan'].includes(item.type))) {
-          // Jeeravan is a rare, deliberate find; never stack packets on the road.
+        } else if (roll < 0.98 && game.distance >= game.jeeravanNextSpawnDistance &&
+                   Math.random() < 0.78 &&
+                   !collectibles.some(item => !item.collected && ['sev','chai','jeeravan','vip'].includes(item.type))) {
+          // Jeeravan has an independent cadence: Sev/Chai cooldowns must not silently
+          // suppress it. Keep one packet on the road at a time and use a safe open lane.
           const z = spawnZ;
           const mesh = createCollectibleMesh('jeeravan');
           mesh.position.set(trailLane * LANE_WIDTH, .85, z);
           scene.add(mesh);
           collectibles.push({type:'jeeravan',lane:trailLane,z,baseY:.85,elevated:false,collected:false,mesh});
-          const jeeravanCooldown = 650 + Math.random() * 200;
+          const jeeravanCooldown = 430 + Math.random() * 120;
           game.jeeravanNextSpawnDistance = game.distance + jeeravanCooldown;
-          game.specialNextSpawnDistance = game.distance + jeeravanCooldown;
         }
       }
 
@@ -4849,12 +5133,32 @@
         game.vipNextSpawnDistance = game.distance + 3800 + Math.random()*1000;
       }
 
-      // Specials are rare discoveries, not routine wave contents. Never place two
-      // special items close together or allow one to queue behind another.
+      // Give players an early taste of a signature power-up in a safe, unoccupied lane.
       const specialAlreadyOnRoad = collectibles.some(item =>
         !item.collected && ['sev','chai','jeeravan','vip'].includes(item.type));
-      if (safeLanes.length && !specialAlreadyOnRoad &&
-          game.distance >= game.specialNextSpawnDistance && Math.random() < 0.035) {
+      let earlySpecialSpawnedThisWave = false;
+      if (!game.earlyPowerupSpawned && game.distance >= 350 &&
+          safeLanes.length && !specialAlreadyOnRoad && !game.policeActive) {
+        const earlyType = Math.random() < 0.68 ? 'sev' : 'chai';
+        const earlyLane = safeLanes[Math.floor(Math.random() * safeLanes.length)];
+        const earlyMesh = createCollectibleMesh(earlyType);
+        earlyMesh.position.set(earlyLane * LANE_WIDTH, 0.95, spawnZ - 12);
+        scene.add(earlyMesh);
+        collectibles.push({
+          type:earlyType, lane:earlyLane, z:spawnZ-12, baseY:0.95,
+          elevated:false, collected:false, earlyRunPickup:true, mesh:earlyMesh
+        });
+        game.earlyPowerupSpawned = true;
+        earlySpecialSpawnedThisWave = true;
+        game.specialNextSpawnDistance = game.distance + 1050;
+        if (earlyType === 'sev') game.sevNextSpawnDistance = game.distance + 1400;
+        else game.chaiNextSpawnDistance = game.distance + 1700;
+      }
+      // Later power-ups remain uncommon and are separated by a distance cooldown.
+      const specialOnRoadAfterEarly = collectibles.some(item =>
+        !item.collected && ['sev','chai','jeeravan','vip'].includes(item.type));
+      if (!earlySpecialSpawnedThisWave && safeLanes.length && !specialOnRoadAfterEarly &&
+          game.distance >= game.specialNextSpawnDistance && Math.random() < 0.045) {
         const chaiEligible = game.distance >= game.chaiNextSpawnDistance;
         const sevEligible = game.distance >= game.sevNextSpawnDistance;
         let pType = null;
@@ -4976,6 +5280,7 @@
         escape_reason: reason
       });
       game.policeActive = false;
+      document.getElementById('game-shell')?.classList.remove('police-danger');
       game.policeTimer = 0;
       game.policeChallengeSpawnClock = 999;
       clearPoliceChallengeHazards();
@@ -5017,12 +5322,12 @@
       game.policeChallengeTotal = 14;
       game.policeChallengesSpawned = 0;
       game.policeChallengesResolved = 0;
-      game.policeEscapeScore = 25;
+      game.policeEscapeScore = 32;
       game.policeChallengeSpawnClock = 0.25;
       game.policeLastChallengeLane = null;
       trackRajwadaEvent('police_chase_start', {
         distance_m: Math.floor(Number(game.distance) || 0),
-        starting_escape_score: 25,
+        starting_escape_score: 32,
         challenge_hazards: game.policeChallengeTotal
       });
 
@@ -5034,8 +5339,8 @@
       if (banner) banner.classList.remove('hidden');
       const status = document.getElementById('police-chase-status');
       const fill = document.getElementById('police-chase-fill');
-      if (fill) fill.style.width = '25%';
-      if (status) status.textContent = 'SIREN WARNING · START 25/100 · POLICE ARRIVES IN 5s';
+      if (fill) fill.style.width = '32%';
+      if (status) status.textContent = 'SIREN WARNING · START 32/100 · POLICE ARRIVES IN 5s';
       audio.playPoliceSiren();
       addFloatingBadge('🚨 SIREN! INSPECTOR IS COMING!', '#fb7185');
     }
@@ -5045,8 +5350,11 @@
       const fill = document.getElementById('police-chase-fill');
       const status = document.getElementById('police-chase-status');
       if (fill) fill.style.width = `${Math.max(0, Math.min(100, game.policeEscapeScore))}%`;
-      if (status) status.textContent =
-        `ESCAPE SCORE ${Math.round(game.policeEscapeScore)}/100 · NEED 60 TO ESCAPE · ${game.policeChallengesResolved}/${game.policeChallengeTotal} CLEARED`;
+      const danger = game.policeEscapeScore < 35;
+      document.getElementById('game-shell')?.classList.toggle('police-danger', danger);
+      if (status) status.textContent = danger
+        ? `DANGER! OFFICER CLOSING IN · ${Math.round(game.policeEscapeScore)}/100 · ${game.policeChallengesResolved}/${game.policeChallengeTotal} CLEARED`
+        : `ESCAPE SCORE ${Math.round(game.policeEscapeScore)}/100 · NEED 60 TO ESCAPE · ${game.policeChallengesResolved}/${game.policeChallengeTotal} CLEARED`;
     }
 
     function activateChaiTurbo(item) {
@@ -5175,7 +5483,7 @@
 
       // Reward a genuinely clean run early: once at least 8 hazards are cleared
       // and the escape score reaches 85, end the chase instead of forcing all 14.
-      if (game.policeChallengesResolved >= 8 && game.policeEscapeScore >= 85) {
+      if (game.policeChallengesResolved >= 7 && game.policeEscapeScore >= 80) {
         finishPoliceEscape('clean_early_escape');
         return;
       }
@@ -5199,15 +5507,13 @@
       // Remove any remaining police challenge obstacles before a Jeeravan revive/game over.
       clearPoliceChallengeHazards();
 
-      // No popup if the player cannot afford the escape, or has already revived.
-      if (game.policeRevivesUsed || game.jeeravanRun < 10) {
+      const reviveUnavailable = game.policeRevivesUsed || game.jeeravanRun < 10;
+      if (reviveUnavailable) {
         trackRajwadaEvent('police_revive_decision', {
           decision: game.policeRevivesUsed ? 'unavailable_already_used' : 'unavailable_insufficient_jeeravan',
           jeeravan_available: Math.floor(Number(game.jeeravanRun) || 0),
           distance_m: Math.floor(Number(game.distance) || 0)
         });
-        triggerGameOver(reasonMsg || 'Police ne pakad liya bhiya!');
-        return;
       }
 
       game.state = 'CAPTURED';
@@ -5224,10 +5530,18 @@
       const countdown = document.getElementById('police-decision-countdown');
 
       if (count) count.textContent = `${game.jeeravanRun}`;
+      const payStatus = document.getElementById('police-pay-status');
       if (payBtn) {
-        payBtn.disabled = false;
-        payBtn.textContent = '🌶️ PAY 10 JEERAVAN & CONTINUE';
+        payBtn.disabled = reviveUnavailable;
+        payBtn.textContent = reviveUnavailable
+          ? (game.policeRevivesUsed ? 'REVIVE ALREADY USED' : 'NEED 10 JEERAVAN TO CONTINUE')
+          : '🌶️ PAY 10 JEERAVAN & CONTINUE';
       }
+      if (payStatus) payStatus.textContent = reviveUnavailable
+        ? (game.policeRevivesUsed
+          ? 'Your one revive has already been used. This run will end when the timer expires.'
+          : 'You need 10 Jeeravan. The decision timer will continue, but payment is unavailable.')
+        : 'Pay 10 Jeeravan within 5 seconds to continue!';
       if (countdown) countdown.textContent = '5';
       if (overlay) overlay.classList.remove('hidden');
 
@@ -5293,6 +5607,34 @@
       audio.playPowerup();
     }
 
+    function updateTutorialCard() {
+      const card = document.getElementById('tutorial-card');
+      const message = document.getElementById('tutorial-message');
+      if (!card || !message) return;
+      const prompts = ['JUMP over a low obstacle', 'SLIDE under the overhead board', 'CHANGE LANES to avoid traffic'];
+      if (!game.tutorialActive || game.tutorialStep >= prompts.length) {
+        card.classList.add('hidden');
+        return;
+      }
+      message.textContent = prompts[game.tutorialStep];
+      card.classList.remove('hidden');
+    }
+
+    function advanceTutorial(action) {
+      if (!game.tutorialActive) return;
+      const required = ['jump','slide','lane'];
+      if (action !== required[game.tutorialStep]) return;
+      game.tutorialStep++;
+      if (game.tutorialStep >= required.length) {
+        game.tutorialActive = false;
+        try { localStorage.setItem('rajwadaRushTutorialDone','1'); } catch (_) {}
+        document.getElementById('tutorial-card')?.classList.add('hidden');
+        addFloatingBadge('CONTROLS MASTERED! CHALO BHIYA!', '#86efac');
+      } else {
+        updateTutorialCard();
+      }
+    }
+
     function startGame() {
       clearPoliceDecisionTimer();
       try {
@@ -5320,6 +5662,19 @@
         });
         game.score = 0;
         game.distance = 0;
+        game.tutorialActive = false;
+        game.tutorialStep = 0;
+        try { game.tutorialActive = localStorage.getItem('rajwadaRushTutorialDone') !== '1'; }
+        catch (_) { game.tutorialActive = false; }
+        updateTutorialCard();
+        const localNow = new Date();
+        const dailyDate = `${localNow.getFullYear()}-${String(localNow.getMonth()+1).padStart(2,'0')}-${String(localNow.getDate()).padStart(2,'0')}`;
+        game.dailyStorageKey = `rajwadaRushDaily8000_${dailyDate}`;
+        const dayNumber = Math.floor(Date.UTC(localNow.getFullYear(),localNow.getMonth(),localNow.getDate()) / 86400000);
+        game.dailyTarget = 8000;
+        try { game.dailyClaimed = localStorage.getItem(game.dailyStorageKey) === '1'; }
+        catch (_) { game.dailyClaimed = false; }
+        document.getElementById('daily-challenge-card')?.classList.toggle('hidden', game.dailyClaimed);
         beginRunMission();
         game.jeeravanRun = 0;
         game.coinsRun = 0;
@@ -5329,11 +5684,13 @@
         game.speed = game.baseSpeed;
         game.zoneIndex = 0;
         game.spawnTimer = 0.45;
-        game.chaiNextSpawnDistance = 1500;
-        game.sevNextSpawnDistance = 1100;
+        game.chaiNextSpawnDistance = 900;
+        game.sevNextSpawnDistance = 700;
+        game.specialNextSpawnDistance = 650;
+        game.earlyPowerupSpawned = false;
         game.jeeravanNextSpawnDistance = 750;
-        game.specialNextSpawnDistance = 900;
         clearVipModeVisuals();
+        document.getElementById('game-shell')?.classList.remove('police-danger');
         game.vipNextSpawnDistance = 2600 + Math.random() * 600;
         game.magnetCoinWaveAt = 0;
         game.magnetCoinWavePending = false;
@@ -5346,7 +5703,7 @@
         game.policeChallengeTotal = 14;
         game.policeChallengesSpawned = 0;
         game.policeChallengesResolved = 0;
-        game.policeEscapeScore = 25;
+        game.policeEscapeScore = 32;
         game.policeChallengeSpawnClock = 0;
         game.policeLastChallengeLane = null;
         game.policeNextAt = 1900 + Math.random() * 700;
@@ -5487,6 +5844,7 @@
       clearPoliceDecisionTimer();
       clearVipModeVisuals();
       game.state = 'GAMEOVER';
+      document.getElementById('game-shell')?.classList.remove('police-danger');
       game.policeActive = false;
       policeChaser.mesh.visible = false;
       hidePoliceChaseHud();
@@ -5806,11 +6164,24 @@
         game.shakeTime = Math.max(0, game.shakeTime - dt);
       }
 
-      const targetBase = Math.min(game.maxSpeed, game.baseSpeed + game.distance * 0.0085);
+      // Endurance balance: gentler acceleration lets skilled players sustain long runs.
+      const earlyRamp = Math.min(game.distance, 420) * 0.014;
+      const longRamp = Math.max(0, game.distance - 420) * 0.006;
+      const targetBase = Math.min(game.maxSpeed, game.baseSpeed + earlyRamp + longRamp);
       const effectiveSpeed = player.chaiTimer > 0 ? targetBase * 1.20 : targetBase;
       game.speed = effectiveSpeed;
 
       game.distance += effectiveSpeed * 1.15 * dt;
+      if (!game.dailyClaimed && game.dailyStorageKey && game.distance >= game.dailyTarget) {
+        game.dailyClaimed = true;
+        game.coinsRun += 50;
+        try { localStorage.setItem(game.dailyStorageKey, '1'); } catch (_) {}
+        addFloatingBadge('DAILY CHALLENGE COMPLETE · +50 SIKKE!', '#fde68a');
+        trackRajwadaEvent('daily_challenge_complete', {
+          target_m: game.dailyTarget, reward_sikke: 50,
+          distance_m: Math.floor(Number(game.distance) || 0)
+        });
+      }
       if (activeMission && activeMission.action === 'distance') {
         updateMissionProgress(game.distance - missionStartDistance);
       }
@@ -5944,7 +6315,7 @@
           ? 0.9
           : (game.policeActive
             ? Math.max(1.35, 1.65 - game.distance * 0.00005)
-            : Math.max(0.56, 0.96 - game.distance * 0.00012));
+            : Math.max(0.88, 1.10 - game.distance * 0.00005));
       }
 
       game.sceneryTimer -= effectiveSpeed * dt;
@@ -6014,9 +6385,15 @@
             } else if (item.type === 'poha') {
               const pohaPts = 12 * game.mult;
               game.score += pohaPts;
+              const previousMult = game.mult;
               game.mult = Math.min(3, game.mult + 1);
               game.maxCombo = Math.max(game.maxCombo, game.mult);
               game.multTimer = game.multMaxTimer;
+              if (game.mult > previousMult) {
+                addFloatingBadge(`SWAD COMBO x${game.mult}!`, '#fde68a');
+                game.shakeTime = Math.max(game.shakeTime, 0.08);
+                game.shakeIntensity = Math.max(game.shakeIntensity, 0.08);
+              }
               audio.playPohaBonus();
               incrementMission('poha');
               spawnParticles3D(item.lane * LANE_WIDTH, 1.8, item.z, 0xff9f1c, 12);
@@ -6065,6 +6442,15 @@
 
         obs.z += effectiveSpeed * dt;
         obs.mesh.position.z = obs.z;
+        if (obs.type === 'sabjithela' && obs.mesh.userData.vendorParts) {
+          const parts = obs.mesh.userData.vendorParts;
+          obs.vendorAnimTime = (obs.vendorAnimTime || 0) + dt * 10;
+          const gait = Math.sin(obs.vendorAnimTime + obs.z * 0.025);
+          parts.legParts.forEach((leg,idx) => { leg.rotation.x = (idx ? -1 : 1) * gait * 0.22; });
+          parts.armParts.forEach((arm,idx) => { arm.rotation.x = -0.78 + (idx ? -1 : 1) * gait * 0.055; });
+          parts.vendor.position.y = Math.abs(gait) * 0.018;
+          parts.wheels.forEach(wheel => { wheel.rotation.x += effectiveSpeed * dt * 2.8; });
+        }
 
         // Close-Call or Clean Jump Over Bhandara Bonus
         if (!obs.nearMissAwarded && obs.z > 1.4) {
@@ -6086,16 +6472,20 @@
             audio.playPohaBonus();
             addFloatingBadge(`BHANDARA PRASAD +${bPts}!`, '#ffd166');
           } else if (distLane >= 0.40 && distLane <= 0.78) {
-            const cPts = 4 * game.mult;
+            const cPts = 6 * game.mult;
             game.score += cPts;
-            addFloatingBadge(`CLOSE CALL +${cPts}`, '#38bdf8');
+            spawnParticles3D(player.visualX * LANE_WIDTH, 1.05, 0, 0x38bdf8, 10);
+            game.shakeTime = Math.max(game.shakeTime, 0.07);
+            game.shakeIntensity = Math.max(game.shakeIntensity, 0.075);
+            addFloatingBadge(`NEAR MISS! +${cPts}`, '#7dd3fc');
           }
           if (game.policeActive && distLane >= 0.40 && distLane <= 0.78) {
             game.policeGap = Math.min(100, game.policeGap + 12);
           }
         }
 
-        const zHitWindow = obs.type === 'ibus' ? 1.55 : obs.type === 'bhandara' ? 1.05 : 0.9;
+        const isThela = ['sabjithela','panipuri','bakedsamosa','paanthela'].includes(obs.type);
+        const zHitWindow = obs.type === 'ibus' ? 1.55 : isThela ? 1.28 : obs.type === 'bhandara' ? 1.05 : 0.9;
         // Test the full contact window, not just one frame. This avoids missed/erratic
         // pothole contacts when frame timing changes or the runner is near jump apex.
         const insideContactWindow = obs.z >= -zHitWindow && obs.z <= zHitWindow;
@@ -6201,6 +6591,16 @@
               collided = true;
               crashReason = 'MP-09 Auto-Rickshaw se takkar ho gayi!';
             }
+          } else if (['sabjithela','panipuri','bakedsamosa','paanthela'].includes(obs.type)) {
+            if (player.y < 1.42) {
+              collided = true;
+              crashReason = ({
+                sabjithela:'Sabji ka thela saamne aa gaya bhiya! Dhyaan se daudo!',
+                panipuri:'Pani puri wale bhaiya ka thela takra gaya!',
+                bakedsamosa:'Baked samose ka thela saamne aa gaya bhiya!',
+                paanthela:'Paan wale ka thela takra gaya bhiya!'
+              })[obs.type];
+            }
           } else if (obs.type === 'policebarrier') {
             if (player.y < 1.18) {
               collided = true;
@@ -6225,7 +6625,7 @@
             // the final score, rather than one unlucky collision, decides capture.
             // A vehicle collision is a normal crash, not a police capture.
             // Keep the real collision reason on the game-over screen.
-            if (obs.type === 'auto' || obs.type === 'ibus') {
+            if (obs.type === 'auto' || obs.type === 'ibus' || ['sabjithela','panipuri','bakedsamosa','paanthela'].includes(obs.type)) {
               scene.remove(obs.mesh);
               obstacles.splice(i, 1);
               spawnParticles3D(player.visualX * LANE_WIDTH, 1.1, 0, 0xef4444, 22);
@@ -6376,6 +6776,16 @@
 
       document.getElementById('hud-jeeravan').textContent = game.jeeravanRun.toLocaleString();
       document.getElementById('hud-coins').textContent = game.coinsRun.toLocaleString();
+      const dailyCard = document.getElementById('daily-challenge-card');
+      if (dailyCard && game.dailyTarget > 0) {
+        dailyCard.classList.toggle('hidden', game.dailyClaimed);
+        if (!game.dailyClaimed) {
+          const dailyText = document.getElementById('daily-challenge-text');
+          const dailyFill = document.getElementById('daily-challenge-fill');
+          if (dailyText) dailyText.textContent = `Reach ${game.dailyTarget.toLocaleString()}m in one run · +50 Sikke`;
+          if (dailyFill) dailyFill.style.width = `${Math.min(100, game.distance / game.dailyTarget * 100)}%`;
+        }
+      }
       const shieldButton = document.getElementById('btn-shield-activate');
       if (player.shieldCharges > 0 && game.shieldHintTimer > 0) {
         shieldButton.classList.remove('hidden','hint-fading');
@@ -6456,14 +6866,19 @@
     // ==========================================================================
     // 11. RESIZE HANDLER & MAIN 60FPS WEBGL LOOP
     // ==========================================================================
-    // Prevent a hidden/background tab from producing a huge physics step on return.
+    // Mobile/release polish: pause when the page is backgrounded so the player
+    // never returns to a run that continued out of sight. Resume remains explicit.
     document.addEventListener('visibilitychange', () => {
+      if (document.hidden && game.state === 'PLAYING') {
+        pauseGame();
+      }
       game.lastFrameTime = performance.now();
     });
 
     window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.aspect = window.innerWidth / Math.max(1, window.innerHeight);
       camera.updateProjectionMatrix();
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, window.innerWidth < 768 ? 1.6 : 2));
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
